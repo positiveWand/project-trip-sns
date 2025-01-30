@@ -63,8 +63,13 @@
 @layer base {
   * {
     @apply border-border;
+    font-family: 'Pretendard';
   }
   body {
     @apply bg-background text-foreground;
+    height: 100svh;
+  }
+  #root {
+    height: 100%;
   }
 }
