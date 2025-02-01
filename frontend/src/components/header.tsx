@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useUser } from '@/context/session-context';
+import { useSession, useUser } from '@/context/session-context';
 
 export interface HeaderProps extends React.ComponentProps<'header'> {}
 
@@ -97,6 +97,8 @@ export interface UserMenuProps extends React.ButtonHTMLAttributes<HTMLButtonElem
 
 const UserMenu = React.forwardRef<HTMLButtonElement, UserMenuProps>(
   ({ username, className, ...props }, ref) => {
+    const { destroySession } = useSession();
+
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -116,7 +118,8 @@ const UserMenu = React.forwardRef<HTMLButtonElement, UserMenuProps>(
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
-              alert('로그아웃');
+              destroySession();
+              location.href = MAIN_PAGE;
             }}
           >
             <LogOut />

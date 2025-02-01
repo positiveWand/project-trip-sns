@@ -1,39 +1,91 @@
 import * as React from 'react';
 
+export interface User {
+  name: string;
+  id: string;
+  email: string;
+}
 export interface Session {
   active: boolean;
-  user: {
-    name: string;
-    id: string;
-    email: string;
-  } | null;
+  user: User | null;
 }
 
-export interface ActionResult {
+type Action =
+  | {
+      type: 'ACTIVATE_SESSION';
+      user: User;
+    }
+  | {
+      type: 'DEACTIVATE_SESSION';
+    };
+
+const reducer: React.Reducer<Session, Action> = (state, action) => {
+  switch (action.type) {
+    case 'ACTIVATE_SESSION':
+      return {
+        active: true,
+        user: { ...action.user },
+      };
+
+    case 'DEACTIVATE_SESSION':
+      return {
+        active: false,
+        user: null,
+      };
+  }
+};
+
+export interface SessionActionResult {
   success: boolean;
-  description: string;
 }
 
-export interface LoginActionResult extends ActionResult {}
-export interface LogoutActionResult extends ActionResult {}
-export interface CheckActionResult extends ActionResult {
-  active: boolean;
+export interface CreateSessionResult extends SessionActionResult {
+  error?: {
+    type: 'NO_DEFINITION' | 'NO_ACCOUNT' | 'NETWORK_FAILURE';
+    message: string;
+  };
+}
+export interface DestroySessionResult extends SessionActionResult {
+  error?: {
+    type: 'NO_DEFINITION' | 'NO_SESSION' | 'NETWORK_FAILURE';
+    message: string;
+  };
+}
+export interface CheckSessionResult extends SessionActionResult {
+  error?: {
+    type: 'NO_DEFINITION' | 'NETWORK_FAILURE';
+    message: string;
+  };
 }
 
 export interface SessionActions {
-  sessionLogin: () => LoginActionResult;
-  sessionLogout: () => LogoutActionResult;
-  sessionCheck: () => CheckActionResult;
+  createSession: (id: string, password: string) => CreateSessionResult;
+  destroySession: () => DestroySessionResult;
+  checkSession: () => CheckSessionResult;
 }
 
 const SessionContext = React.createContext<Session>({ active: false, user: null });
 const SessionActionsContext = React.createContext<SessionActions>({
-  sessionLogin: () => ({ success: false, description: '세션 생성 방법이 정의되지 않았습니다.' }),
-  sessionLogout: () => ({ success: false, description: '세션 생성 방법이 정의되지 않았습니다.' }),
-  sessionCheck: () => ({
+  createSession: () => ({
     success: false,
-    description: '세션 생성 방법이 정의되지 않았습니다.',
-    active: false,
+    error: {
+      type: 'NO_DEFINITION',
+      message: '세션 생성 방법이 정의되지 않았습니다.',
+    },
+  }),
+  destroySession: () => ({
+    success: false,
+    error: {
+      type: 'NO_DEFINITION',
+      message: '세션 제거 방법이 정의되지 않았습니다.',
+    },
+  }),
+  checkSession: () => ({
+    success: false,
+    error: {
+      type: 'NO_DEFINITION',
+      message: '세션 확인 방법이 정의되지 않았습니다.',
+    },
   }),
 });
 
@@ -42,56 +94,86 @@ export interface SessionProviderProps {
 }
 
 const SessionProvider = ({ children }: SessionProviderProps) => {
-  const [session, setSession] = React.useState<Session>({ active: false, user: null });
+  const [session, dispatch] = React.useReducer(reducer, {
+    active: false,
+    user: null,
+  });
 
-  React.useEffect(() => {}, []);
+  React.useEffect(() => {
+    if (sessionStorage.getItem('session')) {
+      dispatch({
+        type: 'ACTIVATE_SESSION',
+        user: JSON.parse(sessionStorage.getItem('session') as string) as User,
+      });
+    } else {
+      dispatch({
+        type: 'DEACTIVATE_SESSION',
+      });
+    }
+  }, []);
 
   const actions = React.useMemo<SessionActions>(
     () => ({
-      sessionLogin() {
+      createSession(id, password) {
         // 세션 로그인
         // 테스트 세션
-        setSession({
-          active: true,
-          user: {
-            name: '신경방',
-            id: 'singbhang',
-            email: 'singbhang@gmail.com',
-          },
-        });
 
-        return {
-          success: true,
-          description: '로그인 성공.',
+        const testuser = {
+          name: '신경방',
+          id: 'singbhang',
+          password: 'password123!',
+          email: 'singbhang@gmail.com',
         };
-      },
-      sessionLogout() {
-        // 세션 로그아웃
-        setSession({
-          active: false,
-          user: null,
-        });
 
-        return {
-          success: true,
-          description: '로그아웃 성공.',
-        };
-      },
-      sessionCheck() {
-        // 세션 확인
-        if (session.active) {
+        if (id != testuser.id || password != testuser.password) {
           return {
-            success: true,
-            description: '인증된 상태입니다.',
-            active: true,
-          };
-        } else {
-          return {
-            success: true,
-            description: '인증된 상태되지 않은 상태입니다.',
-            active: false,
+            success: false,
+            error: {
+              type: 'NO_ACCOUNT',
+              message: '아이디 또는 비밀번호가 맞지 않습니다.',
+            },
           };
         }
+
+        sessionStorage.setItem('session', JSON.stringify(testuser));
+
+        dispatch({
+          type: 'ACTIVATE_SESSION',
+          user: testuser,
+        });
+
+        return {
+          success: true,
+        };
+      },
+      destroySession() {
+        // 세션 로그아웃
+        sessionStorage.removeItem('session');
+
+        dispatch({
+          type: 'DEACTIVATE_SESSION',
+        });
+
+        return {
+          success: true,
+        };
+      },
+      checkSession() {
+        // 세션 확인
+        if (sessionStorage.getItem('session')) {
+          dispatch({
+            type: 'ACTIVATE_SESSION',
+            user: JSON.parse(sessionStorage.getItem('session') as string) as User,
+          });
+        } else {
+          dispatch({
+            type: 'DEACTIVATE_SESSION',
+          });
+        }
+
+        return {
+          success: true,
+        };
       },
     }),
     [],
@@ -106,13 +188,19 @@ const SessionProvider = ({ children }: SessionProviderProps) => {
 
 function useSession() {
   const session = React.useContext(SessionContext);
-  const { sessionLogin, sessionLogout } = React.useContext(SessionActionsContext);
+  const sessionIsActive = session.active;
+  const { createSession, destroySession, checkSession } = React.useContext(SessionActionsContext);
 
-  return { session, sessionLogin, sessionLogout };
+  return { sessionIsActive, session, createSession, destroySession, checkSession };
 }
 
 function useUser() {
   const session = React.useContext(SessionContext);
+  const sessionIsActive = session.active;
+
+  if (!sessionIsActive) {
+    return null;
+  }
 
   return session.user;
 }
