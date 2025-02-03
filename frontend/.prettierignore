@@ -17,6 +17,8 @@ signup/
 map/
 my/
 
+/src/components/ui
+
 # 기타
 .vscode/
 .idea/
