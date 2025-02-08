@@ -36,7 +36,7 @@ export function useForm<T extends Record<string, any>>(formPattern: {
     const results: { [name: string]: boolean } = {};
     for (const name in formPattern) {
       results[name] = validator[name](data[name]);
-      console.log(name, results[name]);
+      // console.log(name, results[name]);
     }
 
     return results;
@@ -50,7 +50,7 @@ export function useForm<T extends Record<string, any>>(formPattern: {
       return;
     }
 
-    console.log(name, data[name], value);
+    // console.log(name, data[name], value);
     data[name] = value;
     setData({ ...data });
   };
