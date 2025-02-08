@@ -1,0 +1,432 @@
+openapi: 3.0.3
+info:
+  title: project-beacon API
+  version: "0.0.0"
+  description: |
+    항로표지를 모니터링하는 시스템인 BMS를 위한 API입니다.
+servers:
+  - url: "https://www.projectbeacon.com/api/v1"
+
+tags:
+  - name: auth
+    description: 회원관리, 인증, 인가 관련 API
+  - name: user
+    description: 사용자 정보 API
+  - name: beacon
+    description: 항로표지 정보 API
+
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - auth
+      summary: 회원가입 요청
+      description: 전달된 회원 정보로 회원가입을 요청합니다. 회원가입된 사용자는 사용자 세션을 생성하고 부가적인 서비스에 접근할 수 있게 됩니다.
+      requestBody:
+        description: 회원가입에 필요한 회원정보.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: 회원가입 성공입니다. 제출한 아이디와 비밀번호로 로그인이 가능합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "422":
+          description: 회원가입 실패입니다. 회원정보가 유효하지 않은 형식이거나 중복된 회원이 이미 가입되어 있습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: 로그인 요청
+      description: 인증 크리덴셜을 이용해 사용자 세션을 생성합니다.
+      requestBody:
+        description: 세션 생성을 위해 필요한 사용자 인증 크리덴셜입니다. 회원가입 시 등록한 아이디, 비밀번호를 사용해야합니다.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCredentials"
+      responses:
+        "200":
+          description: 로그인 성공입니다. 사용자 세션이 생성되었습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: 로그인 실패입니다. 아이디 또는 비밀번호가 회원정보와 일치하지 않는 경우의 응답입니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "422":
+          description: 로그인 실패입니다. 아이디/비밀번호가 요구 형식을 만족하지 않는 경우의 응답입니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/logout:
+    post:
+      tags:
+        - auth
+      summary: 로그아웃 요청
+      description: 로그인 요청으로 생성된 사용자 세션을 종료합니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "204":
+          description: 로그아웃 성공입니다. 사용자 세션이 종료되었습니다.
+        "401":
+          description: 로그아웃 실패입니다. 애초에 로그인이 되어있지 않거나, 세션이 만료되었을 가능성이 높습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/me:
+    get:
+      tags:
+        - auth
+      summary: 세션 정보 조회
+      description: 세션 ID를 이용해 사용자 세션에 대한 정보를 조회합니다. 요청 시에는 쿠키 헤더에 세션 ID가 반드시 포함되어 있어야합니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "200":
+          description: 세션 조회 성공입니다. 세션 사용자에 대한 정보가 반환됩니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: 세션 조회 실패입니다. 애초에 로그인이 되어있지 않거나, 세션이 만료되었을 가능성이 높습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/delete-account:
+    post:
+      tags:
+        - auth
+      summary: 회원탈퇴
+      description: 사이트에서 회원이 탈퇴합니다. 회원 소유의 데이터는 모두 삭제됩니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "204":
+          description: 회원탈퇴 성공입니다. 회원 계정과 회원 소유의 데이터는 모두 삭제됐습니다.
+        "401":
+          description: 회원탈퇴 실패입니다. 탈퇴를 하기 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/update-profile:
+    post:
+      tags:
+        - auth
+      summary: 회원정보 변경
+      description: 회원정보를 변경합니다.
+      security:
+        - CookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserPatch"
+      responses:
+        "200":
+          description: 회원정보 변경 성공입니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: 회원정보 변경 실패입니다. 변경하기 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "422":
+          description: 회원정보 변경 실패입니다. 회원정보가 유효하지 않은 형식입니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/update-password:
+    post:
+      tags:
+        - auth
+      summary: 회원계정 비밀번호 변경
+      description: 회원계정 비밀번호를 변경합니다.
+      security:
+        - CookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordPatch"
+      responses:
+        "204":
+          description: 회원계정 비밀번호 변경 성공입니다.
+        "401":
+          description: 회원계정 비밀번호 변경 실패입니다. 사용자가 인증되어 있지 않거나 기존 비밀번호(oldPassword)가 회원정보와 일치하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "422":
+          description: 회원계정 비밀번호 변경 실패입니다. 비밀번호가 요구 형식을 만족하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{user_id}/favorites:
+    parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
+        description: 사용자 회원 ID
+    get:
+      tags:
+        - user
+      summary: 회원의 "즐겨찾기" 조회
+      description: 회원(user_id)이 "즐겨찾기"에 추가한 항로표지 목록을 조회합니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "200":
+          description: 즐겨찾기 조회에 성공했습니다. 
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BeaconId"
+        "401":
+          description: 즐겨찾기 조회에 실패했습니다. 즐겨찾기 조회를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+    post:
+      tags:
+        - user
+      summary: 회원의 "즐겨찾기"에 항로표지 추가
+      description: 회원(user_id)의 "즐겨찾기"에 항로표지를 추가합니다.
+      security:
+        - CookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/BeaconId"
+      responses:
+        "204":
+          description: 즐겨찾기 추가에 성공했습니다.
+        "401":
+          description: 즐겨찾기 추가에 실패했습니다. 즐겨찾기 추가를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+        "403":
+          description: 즐겨찾기 추가에 실패했습니다. 회원은 자신의 즐겨찾기에만 항로표지를 추가할 수 있습니다.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+        "404":
+          description: 즐겨찾기 추가에 실패했습니다. 즐겨찾기에 추가하려는 항로표지가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+  /users/{user_id}/favorites/{beacon_id}:
+    parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          type: string
+        description: 사용자 회원 ID
+      - in: path
+        name: beacon_id
+        required: true
+        schema:
+          type: string
+        description: 삭제하려는 항로표지 ID
+    delete:
+      tags:
+        - user
+      summary: 회원의 "즐겨찾기"에서 특정 항로표지를 삭제
+      description: 회원(user_id)의 "즐겨찾기"에서 항로표지(beacon_id)를 삭제합니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "204":
+          description: 즐겨찾기 삭제에 성공했습니다.
+        "401":
+          description: 즐겨찾기 삭제에 실패했습니다. 즐겨찾기 삭제를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+        "403":
+          description: 즐겨찾기 삭제에 실패했습니다. 회원은 자신의 즐겨찾기에서만 항로표지를 삭제할 수 있습니다.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+        "404":
+          description: 즐겨찾기 삭제에 실패했습니다. 즐겨찾기에 항로표지가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  message:
+                    type: string
+  
+  /beacons/summary:
+    get:
+      tags:
+        - beacon
+      summary:
+      description:
+      responses:
+        "200":
+          description: 
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BeaconSummary"
+      
+
+
+components:
+  securitySchemes:
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID
+  schemas:
+    TrueOnly:
+      type: boolean
+      enum:
+        - true
+    FalseOnly:
+      type: boolean
+      enum:
+        - false
+    
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    UserCredentials:
+      type: object
+      properties:
+        id:
+          type: string
+        password:
+          type: string
+      required:
+        - id
+        - password
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+      required:
+        - id
+        - password
+        - name
+        - email
+    UserPatch:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+    PasswordPatch:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+        newPassword:
+          type: string
+      required:
+        - oldPassword
+        - newPassword
+      
+    BeaconId:
+      type: string
+    BeaconSummary:
+      type: object
+    Beacon:
+      type: object
+    MaintRecord:
+      type: object
