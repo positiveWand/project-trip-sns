@@ -1,69 +1,75 @@
+import axios from 'axios';
+
 export interface SuccessResponse<T> {
   success: true;
-  body: T;
+  data: T;
 }
 
-export type BasicErrorType = 'CLIENT_ERROR' | 'NETWORK_ERROR' | 'SERVER_ERROR';
+export type BaseError = 'NETWORK_ERROR' | 'TIMEOUT_ERROR' | 'UNKNOWN';
 export interface ErrorResponse<T> {
   success: false;
-  error: {
-    type: T | BasicErrorType;
-    message: string;
-  };
+  error: T | BaseError;
+  message: string;
 }
 
 export type Response<T, U> = SuccessResponse<T> | ErrorResponse<U>;
 
-export interface PathParams {
-  [key: string]: string | number;
-}
+const SERVER_URL = '';
+const TIMEOUT = 5000;
 
-export class UrlBuilder {
-  #url;
-  #pathVariable: PathParams;
-  #serachParam: URLSearchParams;
+export const apiClient = axios.create({
+  baseURL: SERVER_URL,
+  timeout: TIMEOUT,
+  withCredentials: true,
+});
 
-  constructor(url: string) {
-    this.#url = url;
-    this.#pathVariable = {};
-    this.#serachParam = new URLSearchParams();
-  }
+export const envelopeApiClient = axios.create({
+  baseURL: SERVER_URL,
+  timeout: TIMEOUT,
+  withCredentials: true,
+});
 
-  setPathVariable(name: string, value: string | number): UrlBuilder {
-    this.#pathVariable[name] = value;
-    return this;
-  }
-
-  setSearchParam(name: string, value: string | number): UrlBuilder {
-    this.#serachParam.set(name, value + '');
-    return this;
-  }
-
-  build(): string {
-    let result = '';
-    result += this.#url;
-    for (const pv in this.#pathVariable) {
-      result.replace(`{${pv}}`, this.#pathVariable[pv] + '');
+envelopeApiClient.interceptors.response.use(
+  (response) => {
+    response.data = {
+      success: true,
+      data: response.data,
+    };
+    return response;
+  },
+  (error) => {
+    if (axios.isAxiosError(error) && error.response) {
+      error.response.data = {
+        success: false,
+        ...error.response.data,
+      };
+      return Promise.resolve(error.response);
     }
 
-    result += this.#serachParam.toString();
+    return Promise.reject(error);
+  },
+);
 
-    return result;
+export const defaultErrorHandler = (error: unknown): ErrorResponse<any> => {
+  if (axios.isAxiosError(error)) {
+    if (error.code == 'ECONNABORTED') {
+      return {
+        success: false,
+        error: 'TIMEOUT_ERROR',
+        message: '서버 응답이 너무 오래걸립니다.',
+      };
+    } else if (!error.response) {
+      return {
+        success: false,
+        error: 'NETWORK_ERROR',
+        message: '네트워크 사용이 원활하지 않아 요청에 실패했습니다.',
+      };
+    }
   }
-}
 
-export async function request(url: string, options: RequestInit) {
-  try {
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      ...options,
-    });
-
-    return response;
-  } catch (error) {
-    console.log(`[요청 오류] ${error}`);
-  }
-}
+  return {
+    success: false,
+    error: 'UNKNOWN',
+    message: '알 수 없는 이유로 요청에 실패했습니다.',
+  };
+};
