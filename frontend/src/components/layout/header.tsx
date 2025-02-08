@@ -10,10 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useSession } from '@/hooks/use-session';
-import { useUser } from '@/hooks/use-user';
 import { useToast } from '@/hooks/use-toast';
-import { requestLogout } from '@/lib/requests/auth/request-logout';
+import { requestLogout } from '@/lib/requests/request-auth';
+import { useUserSession } from '@/hooks/use-user-session';
 
 export interface HeaderProps extends React.ComponentProps<'header'> {}
 
@@ -29,8 +28,7 @@ const NAVIGATION_LINKS = [
 ];
 
 function Header({ className }: HeaderProps) {
-  const user = useUser();
-
+  const [sessionIsActive, user] = useUserSession();
   return (
     <header className={cn('w-full border-b border-border/50 px-5 py-3 flex bg-primary', className)}>
       <div className='flex text-primary-foreground'>
@@ -64,9 +62,9 @@ function Header({ className }: HeaderProps) {
       </div>
 
       <div className='flex flex-1 justify-end items-center text-primary-foreground'>
-        {user ? (
+        {sessionIsActive ? (
           <>
-            <UserMenu username={user.name} />
+            <UserMenu username={user?.name} />
           </>
         ) : (
           <>
@@ -100,7 +98,6 @@ export interface UserMenuProps extends React.ButtonHTMLAttributes<HTMLButtonElem
 
 const UserMenu = React.forwardRef<HTMLButtonElement, UserMenuProps>(
   ({ username, className, ...props }, ref) => {
-    const { dispatchSession } = useSession();
     const { toast } = useToast();
 
     return (
@@ -121,20 +118,17 @@ const UserMenu = React.forwardRef<HTMLButtonElement, UserMenuProps>(
             <span>계정 설정</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => {
-              const response = requestLogout({});
+            onClick={async () => {
+              const response = await requestLogout();
               if (!response.success) {
                 toast({
-                  title: response.error.type,
-                  description: response.error.message,
+                  title: response.error,
+                  description: response.message,
                   variant: 'destructive',
                 });
                 return;
               }
 
-              dispatchSession({
-                type: 'DEACTIVATE_SESSION',
-              });
               location.href = MAIN_PAGE;
             }}
           >
