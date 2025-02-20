@@ -39,7 +39,7 @@ function Header({ className }: HeaderProps) {
         <MainLogo href={MAIN_PAGE} className='mr-4' />
 
         {NAVIGATION_LINKS.map(({ name, url }) =>
-          location.pathname == url ? (
+          location.pathname.startsWith(url) ? (
             <Button
               variant='link'
               size='sm'
