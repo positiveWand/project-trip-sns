@@ -1,6 +1,6 @@
 const MAIN_PAGE = '/';
 const MAP_PAGE = '/map/';
-const DASHBOARD_PAGE = '/dashboard/';
+const SOCIAL_PAGE = '/social/';
 const LOGIN_PAGE = '/login/';
 const SIGNUP_PAGE = '/signup/';
 const MY_PAGE = '/my/';
@@ -13,7 +13,7 @@ const EMAIL_PATTERN = '^(?!\\.)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'
 export {
   MAIN_PAGE,
   MAP_PAGE,
-  DASHBOARD_PAGE,
+  SOCIAL_PAGE,
   LOGIN_PAGE,
   SIGNUP_PAGE,
   MY_PAGE,

@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
-import { DASHBOARD_PAGE, LOGIN_PAGE, MAIN_PAGE, MAP_PAGE, SIGNUP_PAGE, MY_PAGE } from '@/config';
+import { SOCIAL_PAGE, LOGIN_PAGE, MAIN_PAGE, MAP_PAGE, SIGNUP_PAGE, MY_PAGE } from '@/config';
 import MainLogo from '@/components/ui/main-logo';
 import { LogOut, Settings, UserRound } from 'lucide-react';
 import {
@@ -18,12 +18,16 @@ export interface HeaderProps extends React.ComponentProps<'header'> {}
 
 const NAVIGATION_LINKS = [
   {
+    name: '홈',
+    url: MAIN_PAGE,
+  },
+  {
     name: '지도',
     url: MAP_PAGE,
   },
   {
-    name: '대시보드',
-    url: DASHBOARD_PAGE,
+    name: '소셜',
+    url: SOCIAL_PAGE,
   },
 ];
 

@@ -1,19 +1,22 @@
 openapi: 3.0.3
 info:
-  title: project-beacon API
+  title: project-trip-sns API
   version: "0.0.0"
   description: |
-    항로표지를 모니터링하는 시스템인 BMS를 위한 API입니다.
+    관광지를 탐색하고 추천받을 수 있는 TRIPIN을 위한 API입니다.
 servers:
-  - url: "https://www.projectbeacon.com/api/v1"
+  - url: "https://www.projecttripsns.com/api/v1"
 
 tags:
   - name: auth
     description: 회원관리, 인증, 인가 관련 API
-  - name: user
-    description: 사용자 정보 API
-  - name: beacon
-    description: 항로표지 정보 API
+  - name: 회원
+    description: 회원 API
+  - name: 관광지
+    description: 관광지 API
+  - name: 추천
+    description: 추천 관련 API
+    
 
 paths:
   /auth/signup:
@@ -189,166 +192,469 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
-  /users/{user_id}/favorites:
+  
+  /users:
     parameters:
-      - in: path
-        name: user_id
-        required: true
+      - in: query
+        name: query
         schema:
           type: string
-        description: 사용자 회원 ID
+        description: 회원 ID 검색 문자열
+      - in: query
+        name: pageNo
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+        description: 페이지 번호
+      - in: query
+        name: pageSize
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 100
+        description: 페이지 크기
     get:
       tags:
-        - user
-      summary: 회원의 "즐겨찾기" 조회
-      description: 회원(user_id)이 "즐겨찾기"에 추가한 항로표지 목록을 조회합니다.
+        - 회원
+      summary: 검색 조건에 부합하는 회원 모음 조회
+      description: 검색 조건(query)에 부합하는 회원들을 조회합니다.
       security:
         - CookieAuth: []
       responses:
         "200":
-          description: 즐겨찾기 조회에 성공했습니다. 
+          description: 회원 모음 조회에 성공했습니다.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/BeaconId"
+                  $ref: "#/components/schemas/UserProfile"
         "401":
-          description: 즐겨찾기 조회에 실패했습니다. 즐겨찾기 조회를 위해서는 인증이 필요합니다.
+          description: 회원 모음 조회에 실패했습니다. 조회를 위해서는 인증이 필요합니다.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                  message:
-                    type: string
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: 회원 모음 조회에 실패했습니다. 페이지 파라미터(pageNo, pageSize)가 적절하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /users/{userId}:
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+        description: 회원 ID
+    get:
+      tags:
+        - 회원
+      summary: 회원 프로필 조회
+      description: 회원의 프로필을 조회합니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "200":
+          description: 회원 프로필 조회에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: 회원 프로필 조회에 실패했습니다. 조회를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: 회원 프로필 조회에 실패했습니다. 회원 ID(userId)에 해당하는 회원이 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /users/{userId}/bookmarks:
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+        description: 사용자 회원 ID
+      - in: query
+        name: pageNo
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+        description: 페이지 번호
+      - in: query
+        name: pageSize
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 100
+        description: 페이지 크기
+    get:
+      tags:
+        - 회원
+      summary: 회원의 "북마크" 조회
+      description: 회원(userId)이 "북마크"에 추가한 관광지 모음을 조회합니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "200":
+          description: 북마크 조회에 성공했습니다. 
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bookmark"
+        "401":
+          description: 북마크 조회에 실패했습니다. 조회를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: 북마크 조회에 실패했습니다. 페이지 파라미터(pageNo, pageSize)가 적절하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     post:
       tags:
-        - user
-      summary: 회원의 "즐겨찾기"에 항로표지 추가
-      description: 회원(user_id)의 "즐겨찾기"에 항로표지를 추가합니다.
+        - 회원
+      summary: 회원의 "북마크"에 관광지 추가
+      description: 회원(userId)의 "북마크"에 관광지를 추가합니다.
       security:
         - CookieAuth: []
       requestBody:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                $ref: "#/components/schemas/BeaconId"
+              $ref: "#/components/schemas/Bookmark"
       responses:
-        "204":
-          description: 즐겨찾기 추가에 성공했습니다.
+        "201":
+          description: 북마크 추가에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bookmark"
         "401":
-          description: 즐겨찾기 추가에 실패했습니다. 즐겨찾기 추가를 위해서는 인증이 필요합니다.
+          description: 북마크 추가에 실패했습니다. 추가를 위해서는 인증이 필요합니다.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                  message:
-                    type: string
+                $ref: "#/components/schemas/Error"
         "403":
-          description: 즐겨찾기 추가에 실패했습니다. 회원은 자신의 즐겨찾기에만 항로표지를 추가할 수 있습니다.
+          description: 북마크 추가에 실패했습니다. 회원은 자신의 북마크에만 관광지를 추가할 수 있습니다.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                  message:
-                    type: string
+                $ref: "#/components/schemas/Error"
         "404":
-          description: 즐겨찾기 추가에 실패했습니다. 즐겨찾기에 추가하려는 항로표지가 존재하지 않습니다.
+          description: 북마크 추가에 실패했습니다. 회원이 존재하지 않거나, 북마크에 추가하려는 관광지가 존재하지 않습니다.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                  message:
-                    type: string
-  /users/{user_id}/favorites/{beacon_id}:
+                $ref: "#/components/schemas/Error"
+
+  /users/{userId}/bookmarks/{tourSpotId}:
     parameters:
       - in: path
-        name: user_id
+        name: userId
         required: true
         schema:
           type: string
-        description: 사용자 회원 ID
+        description: 회원 ID
       - in: path
-        name: beacon_id
+        name: tourSpotId
         required: true
         schema:
           type: string
-        description: 삭제하려는 항로표지 ID
+        description: 삭제하려는 관광지 ID
     delete:
       tags:
-        - user
-      summary: 회원의 "즐겨찾기"에서 특정 항로표지를 삭제
-      description: 회원(user_id)의 "즐겨찾기"에서 항로표지(beacon_id)를 삭제합니다.
+        - 회원
+      summary: 회원의 "북마크"에서 특정 관광지를 삭제
+      description: 회원(userId)의 "북마크"에서 관광지(tourSpotId)를 삭제합니다.
       security:
         - CookieAuth: []
       responses:
         "204":
-          description: 즐겨찾기 삭제에 성공했습니다.
+          description: 북마크 삭제에 성공했습니다.
         "401":
-          description: 즐겨찾기 삭제에 실패했습니다. 즐겨찾기 삭제를 위해서는 인증이 필요합니다.
+          description: 북마크 삭제에 실패했습니다. 삭제를 위해서는 인증이 필요합니다.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                  message:
-                    type: string
+                $ref: "#/components/schemas/Error"
         "403":
-          description: 즐겨찾기 삭제에 실패했습니다. 회원은 자신의 즐겨찾기에서만 항로표지를 삭제할 수 있습니다.
+          description: 북마크 삭제에 실패했습니다. 회원은 자신의 북마크에서만 관광지를 삭제할 수 있습니다.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                  message:
-                    type: string
+                $ref: "#/components/schemas/Error"
         "404":
-          description: 즐겨찾기 삭제에 실패했습니다. 즐겨찾기에 항로표지가 존재하지 않습니다.
+          description: 북마크 삭제에 실패했습니다. 회원이 존재하지 않거나, 북마크에 관광지가 존재하지 않습니다.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                  message:
-                    type: string
-  
-  /beacons/summary:
+                $ref: "#/components/schemas/Error"
+
+  /tour-spots:
+    parameters:
+      - in: query
+        name: tags
+        schema:
+          type: array
+          items:
+            type: string
+        description: 관광지 태그 모음
+      - in: query
+        name: sort
+        schema:
+          type: string
+          enum:
+            - ASC_NAME
+            - DSC_NAME
+          default: ASC_NAME
+        description: 관광지 모음 정렬 종류
+      - in: query
+        name: pageNo
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+        description: 페이지 번호
+      - in: query
+        name: pageSize
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 100
+        description: 페이지 크기
+        
     get:
       tags:
-        - beacon
-      summary:
-      description:
+        - 관광지
+      summary: 검색 조건에 부합하는 관광지 모음 조회
+      description: 검색 조건(tags, sort)에 부합하는 관광지들을 조회합니다.
       responses:
         "200":
-          description: 
+          description: 관광지 모음 조회에 성공했습니다.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/BeaconSummary"
+                  $ref: "#/components/schemas/TourSpotOverview"
+        "422":
+          description: 관광지 모음 조회에 실패했습니다. 검색 조건(tags, sort) 또는 페이지 파라미터(pageNo, pageSize)가 적절하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /tour-spots/{tourSpotId}:
+    parameters:
+      - in: path
+        name: tourSpotId
+        required: true
+        schema:
+          type: string
+        description: 관광지 ID
+    get:
+      tags:
+        - 관광지
+      summary: 관광지 조회
+      description: 관광지(tourSpotId)를 조회합니다.
+      responses:
+        "200":
+          description: 관광지 조회에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TourSpot"
+        "404":
+          description: 관광지 모음 조회에 실패했습니다. 관광지 ID(tourSpotId)에 해당하는 관광지가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  
+  /tour-spots/{tourSpotId}/reviews:
+    parameters:
+      - in: path
+        name: tourSpotId
+        required: true
+        schema:
+          type: string
+        description: 관광지 ID
+      - in: query
+        name: pageNo
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+        description: 페이지 번호
+      - in: query
+        name: pageSize
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 100
+        description: 페이지 크기
+    get:
+      tags:
+        - 관광지
+      summary: 관광지 후기 모음 조회
+      description: 관광지(tourSpotId)의 후기 모음을 조회합니다.
+      responses:
+        "200":
+          description: 관광지 후기 모음 조회에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TourSpotReview"
+        "404":
+          description: 관광지 후기 모음 조회에 실패했습니다. 관광지 ID(tourSpotId)에 해당하는 관광지가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: 관광지 후기 모음 조회에 실패했습니다. 페이지 파라미터(pageNo, pageSize)가 적절하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - 관광지
+      summary: 관광지 후기 추가
+      description: 관광지(tourSpotId) 후기를 추가합니다.
+      security:
+        - CookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TourSpotReview"
+      responses:
+        "201":
+          description: 관광지 후기 추가에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TourSpotReview"
+        "401":
+          description: 관광지 후기 추가에 실패했습니다. 추가를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: 관광지 후기 추가에 실패했습니다. 회원은 자신의 후기만 추가할 수 있습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: 관광지 후기 추가에 실패했습니다. 관광지 ID(tourSpotId)에 해당하는 관광지가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /tour-spot-review/{tourSpotReviewId}:
+    parameters:
+      - in: path
+        name: tourSpotReviewId
+        required: true
+        schema:
+          type: string
+        description: 관광지 후기 ID
+    delete:
+      tags:
+        - 관광지
+      summary: 관광지 후기 삭제
+      description: 관광지(tourSpotId)의 후기를 삭제합니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "204":
+          description: 관광지 후기 삭제에 성공했습니다.
+        "401":
+          description: 관광지 후기 삭제에 실패했습니다. 삭제를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: 관광지 후기 삭제에 실패했습니다. 회원은 자신의 후기만 삭제할 수 있습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: 관광지 후기 삭제에 실패했습니다. 후기가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
       
+  /recommendations/{recommendationType}:
+    parameters:
+      - in: path
+        name: recommendationType
+        required: true
+        schema:
+          type: string
+          enum:
+            - main
+    get:
+      tags:
+        - 추천
+      summary: 관광지 추천 조회
+      description: 추천 종류(recommendationType)에 따라 추천된 관광지를 조회합니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "200":
+          description: 관광지 추천 조회에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TourSpotRecommendations"
+        "401":
+          description: 관광지 추천 조회에 실패했습니다. 조회를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: 관광지 추천 조회에 실패했습니다. 추천 종류(recommendationType)에 해당하는 관광지 추천이 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    
+    
+
 
 
 components:
@@ -421,12 +727,103 @@ components:
       required:
         - oldPassword
         - newPassword
-      
-    BeaconId:
-      type: string
-    BeaconSummary:
+    
+    UserProfile:
       type: object
-    Beacon:
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+        - id
+        - name
+
+    Bookmark:
       type: object
-    MaintRecord:
+      properties:
+        userId:
+          type: string
+        tourSpotId:
+          type: string
+      required:
+        - userId
+        - tourSpotId
+    
+    TourSpot:
       type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        address:
+          type: string
+        lat:
+          type: number
+          minimum: -90
+          maximum: 90
+        lng:
+          type: number
+          minimum: -180
+          maximum: 180
+        imageUrl:
+          type: string
+          format: url
+        description:
+          type: string
+        phoneNumber:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    
+    TourSpotOverview:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        address:
+          type: string
+        lat:
+          type: number
+          minimum: -90
+          maximum: 90
+        lng:
+          type: number
+          minimum: -180
+          maximum: 180
+        imageUrl:
+          type: string
+          format: url
+        tags:
+          type: array
+          items:
+            type: string
+    
+    TourSpotReview:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        tourSpotId:
+          type: string
+        userId:
+          type: string
+        content:
+          type: string
+        likes:
+          type: integer
+          minimum: 0
+          readOnly: true
+    
+    TourSpotRecommendations:
+      type: array
+      items:
+        $ref: "#/components/schemas/TourSpotOverview"

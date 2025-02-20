@@ -43,6 +43,10 @@ export default {
   				DEFAULT: 'hsl(var(--destructive))',
   				foreground: 'hsl(var(--destructive-foreground))'
   			},
+			unknown: {
+				DEFAULT: 'hsl(var(--unknown))',
+  				foreground: 'hsl(var(--unknown-foreground))'
+			},
 			low: {
 				DEFAULT: 'hsl(var(--low))',
   				foreground: 'hsl(var(--low-foreground))'
