@@ -539,9 +539,9 @@ paths:
         schema:
           type: string
           enum:
-            - ASC_NAME
-            - DESC_NAME
-          default: ASC_NAME
+            - name-asc
+            - name-desc
+          default: name-asc
         description: 관광지 모음 정렬 종류
       - in: query
         name: pageNo
