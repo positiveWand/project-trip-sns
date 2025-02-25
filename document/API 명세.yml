@@ -3,7 +3,7 @@ info:
   title: project-trip-sns API
   version: "0.0.0"
   description: |
-    관광지를 탐색하고 추천받을 수 있는 TRIPIN을 위한 API입니다.
+    관광지를 탐색하고 추천받을 수 있는 TOURIN을 위한 API입니다.
 servers:
   - url: "https://www.projecttripsns.com/api/v1"
 
@@ -225,6 +225,27 @@ paths:
       responses:
         "200":
           description: 회원 모음 조회에 성공했습니다.
+          headers:
+            X-Pagination-Page:
+              description: 현재 페이지 번호
+              schema:
+                type: integer
+            X-Pagination-Page-Size:
+              description: 현재 페이지 크기
+              schema:
+                type: integer
+            X-Pagination-Page-Limit:
+              description: 페이지 최대 크기
+              schema:
+                type: integer
+            X-Pagination-Total-Page:
+              description: 총 페이지 개수
+              schema:
+                type: integer
+            X-Pagination-Total-Item:
+              description: 총 아이템 개수
+              schema:
+                type: integer
           content:
             application/json:
               schema:
@@ -311,7 +332,28 @@ paths:
         - CookieAuth: []
       responses:
         "200":
-          description: 북마크 조회에 성공했습니다. 
+          description: 북마크 조회에 성공했습니다.
+          headers:
+            X-Pagination-Page:
+              description: 현재 페이지 번호
+              schema:
+                type: integer
+            X-Pagination-Page-Size:
+              description: 현재 페이지 크기
+              schema:
+                type: integer
+            X-Pagination-Page-Limit:
+              description: 페이지 최대 크기
+              schema:
+                type: integer
+            X-Pagination-Total-Page:
+              description: 총 페이지 개수
+              schema:
+                type: integer
+            X-Pagination-Total-Item:
+              description: 총 아이템 개수
+              schema:
+                type: integer 
           content:
             application/json:
               schema:
@@ -426,7 +468,7 @@ paths:
           type: string
           enum:
             - ASC_NAME
-            - DSC_NAME
+            - DESC_NAME
           default: ASC_NAME
         description: 관광지 모음 정렬 종류
       - in: query
@@ -453,6 +495,27 @@ paths:
       responses:
         "200":
           description: 관광지 모음 조회에 성공했습니다.
+          headers:
+            X-Pagination-Page:
+              description: 현재 페이지 번호
+              schema:
+                type: integer
+            X-Pagination-Page-Size:
+              description: 현재 페이지 크기
+              schema:
+                type: integer
+            X-Pagination-Page-Limit:
+              description: 페이지 최대 크기
+              schema:
+                type: integer
+            X-Pagination-Total-Page:
+              description: 총 페이지 개수
+              schema:
+                type: integer
+            X-Pagination-Total-Item:
+              description: 총 아이템 개수
+              schema:
+                type: integer
           content:
             application/json:
               schema:
@@ -524,6 +587,27 @@ paths:
       responses:
         "200":
           description: 관광지 후기 모음 조회에 성공했습니다.
+          headers:
+            X-Pagination-Page:
+              description: 현재 페이지 번호
+              schema:
+                type: integer
+            X-Pagination-Page-Size:
+              description: 현재 페이지 크기
+              schema:
+                type: integer
+            X-Pagination-Page-Limit:
+              description: 페이지 최대 크기
+              schema:
+                type: integer
+            X-Pagination-Total-Page:
+              description: 총 페이지 개수
+              schema:
+                type: integer
+            X-Pagination-Total-Item:
+              description: 총 아이템 개수
+              schema:
+                type: integer
           content:
             application/json:
               schema:
