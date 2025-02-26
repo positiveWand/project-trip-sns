@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw';
+import { AUTHORIZED } from '../config';
 
 const testuser = {
   name: '김철수',
@@ -110,6 +111,15 @@ export const authHandlers = [
           id: user.id,
           name: user.name,
           email: user.email,
+        },
+        { status: 200 },
+      );
+    } else if (AUTHORIZED) {
+      return HttpResponse.json(
+        {
+          id: testuser.id,
+          name: testuser.name,
+          email: testuser.email,
         },
         { status: 200 },
       );
