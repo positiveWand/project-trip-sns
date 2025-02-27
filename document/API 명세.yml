@@ -490,6 +490,38 @@ paths:
         schema:
           type: string
         description: 삭제하려는 관광지 ID
+    get:
+      tags:
+        - 회원
+      summary: 회원의 "북마크"에서 특정 관광지를 조회
+      description: 회원(userId)의 "북마크"에서 관광지(tourSpotId)를 조회합니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "200":
+          description: 북마크 조회에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bookmark'
+        "400":
+          description: 북마크 조회에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 북마크 조회에 실패했습니다. 조회를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: 북마크 조회에 실패했습니다. 회원이 존재하지 않거나, 북마크에 관광지가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     delete:
       tags:
         - 회원
@@ -520,6 +552,55 @@ paths:
                 $ref: "#/components/schemas/Error"
         "404":
           description: 북마크 삭제에 실패했습니다. 회원이 존재하지 않거나, 북마크에 관광지가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /users/{userId}/tour-spot-reviews/likes:
+    get:
+      tags:
+        - 회원
+      summary: 회원과 관광지 후기의 공감 관계를 조회
+      description: 회원(userId)과 관광지 후기들(tourSpotIds) 간의 공감 관계(공감 여부)를 조회합니다.
+      security:
+        - CookieAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: 사용자 회원 ID
+        - in: query
+          name: tourSpotReviewIds
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: 관광지 후기 ID
+      responses:
+        "200":
+          description: 관광지 후기 공감 여부 모음 조회에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tourSpotReviewId:
+                      type: string
+                    liked:
+                      type: boolean
+        "400":
+          description: 관광지 후기 공감 여부 모음 조회에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 관광지 후기 공감 여부 모음 조회에 실패했습니다. 회원(userId)이 존재하지 않거나, 관광지 후기 ID(tourSpotReviewIds)에 해당하는 후기가 존재하지 않습니다.
           content:
             application/json:
               schema:
@@ -759,7 +840,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /tour-spot-review/{tourSpotReviewId}:
+  /tour-spot-reviews/{tourSpotReviewId}:
     parameters:
       - in: path
         name: tourSpotReviewId
@@ -797,6 +878,57 @@ paths:
                 $ref: "#/components/schemas/Error"
         "404":
           description: 관광지 후기 삭제에 실패했습니다. 후기가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /tour-spot-reviews/{tourSpotReviewId}/likes:
+    parameters:
+      - in: path
+        name: tourSpotReviewId
+        required: true
+        schema:
+          type: string
+        description: 관광지 후기 ID
+    put:
+      tags:
+        - 관광지
+      summary: 관광지 후기 "공감" 변경
+      description: 회원(userId)이 관광지 후기(tourSpotReviewId)를 "공감" 또는 "공감 취소"합니다.
+      security:
+        - CookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TourSpotReviewLike"
+      responses:
+        "201":
+          description: 관광지 후기 공감 변경에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TourSpotReviewLike"
+        "400":
+          description: 관광지 후기 공감 변경에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 관광지 후기 공감 변경에 실패했습니다. 변경을 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: 관광지 후기 공감 변경에 실패했습니다. 회원은 자신의 공감만 변경할 수 있습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: 관광지 후기 공감 변경에 실패했습니다. 회원(userId) 또는 관광지 후기(tourSpotReviewId)가 존재하지 않습니다.
           content:
             application/json:
               schema:
@@ -1014,6 +1146,16 @@ components:
           type: integer
           minimum: 0
           readOnly: true
+    
+    TourSpotReviewLike:
+      type: object
+      properties:
+        userId:
+          type: string
+        tourSpotReviewId:
+          type: string
+        liked:
+          type: boolean
     
     TourSpotRecommendations:
       type: array
