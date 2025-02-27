@@ -262,8 +262,6 @@ paths:
         - 회원
       summary: 검색 조건에 부합하는 회원 모음 조회
       description: 검색 조건(query)에 부합하는 회원들을 조회합니다.
-      security:
-        - CookieAuth: []
       responses:
         "200":
           description: 회원 모음 조회에 성공했습니다.
@@ -326,8 +324,6 @@ paths:
         - 회원
       summary: 회원 프로필 조회
       description: 회원의 프로필을 조회합니다.
-      security:
-        - CookieAuth: []
       responses:
         "200":
           description: 회원 프로필 조회에 성공했습니다.
@@ -362,28 +358,27 @@ paths:
         schema:
           type: string
         description: 사용자 회원 ID
-      - in: query
-        name: pageNo
-        schema:
-          type: integer
-          minimum: 1
-          default: 1
-        description: 페이지 번호
-      - in: query
-        name: pageSize
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-          maximum: 100
-        description: 페이지 크기
     get:
       tags:
         - 회원
       summary: 회원의 "북마크" 조회
       description: 회원(userId)이 "북마크"에 추가한 관광지 모음을 조회합니다.
-      security:
-        - CookieAuth: []
+      parameters:
+        - in: query
+          name: pageNo
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: 페이지 번호
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          description: 페이지 크기
       responses:
         "200":
           description: 북마크 조회에 성공했습니다.
@@ -495,8 +490,6 @@ paths:
         - 회원
       summary: 회원의 "북마크"에서 특정 관광지를 조회
       description: 회원(userId)의 "북마크"에서 관광지(tourSpotId)를 조회합니다.
-      security:
-        - CookieAuth: []
       responses:
         "200":
           description: 북마크 조회에 성공했습니다.
@@ -562,8 +555,6 @@ paths:
         - 회원
       summary: 회원과 관광지 후기의 공감 관계를 조회
       description: 회원(userId)과 관광지 후기들(tourSpotIds) 간의 공감 관계(공감 여부)를 조회합니다.
-      security:
-        - CookieAuth: []
       parameters:
         - in: path
           name: userId
@@ -608,6 +599,11 @@ paths:
 
   /tour-spots:
     parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        description: 검색 키워드
       - in: query
         name: tags
         schema:
@@ -729,26 +725,27 @@ paths:
         schema:
           type: string
         description: 관광지 ID
-      - in: query
-        name: pageNo
-        schema:
-          type: integer
-          minimum: 1
-          default: 1
-        description: 페이지 번호
-      - in: query
-        name: pageSize
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-          maximum: 100
-        description: 페이지 크기
     get:
       tags:
         - 관광지
       summary: 관광지 후기 모음 조회
       description: 관광지(tourSpotId)의 후기 모음을 조회합니다.
+      parameters:
+        - in: query
+          name: pageNo
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: 페이지 번호
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          description: 페이지 크기
       responses:
         "200":
           description: 관광지 후기 모음 조회에 성공했습니다.
@@ -1068,6 +1065,7 @@ components:
       properties:
         userId:
           type: string
+          readOnly: true
         tourSpotId:
           type: string
       required:
@@ -1138,6 +1136,7 @@ components:
           readOnly: true
         tourSpotId:
           type: string
+          readOnly: true
         userId:
           type: string
         content:
@@ -1154,6 +1153,7 @@ components:
           type: string
         tourSpotReviewId:
           type: string
+          readOnly: true
         liked:
           type: boolean
     
