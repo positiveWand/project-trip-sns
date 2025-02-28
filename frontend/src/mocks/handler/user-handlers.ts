@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { TEST_USERS, User, Bookmark, TEST_BOOKMARKS } from '../database/user';
 import { AUTHORITY, AUTHORIZED } from '../config';
+import { TEST_TOUR_SPOT_REVIEW_LIKES, TourSpotReviewLike } from '../database/tour-spot-review';
 
 type Profile = Pick<User, 'id' | 'name'>;
 
@@ -15,13 +16,13 @@ export const userHandlers = [
   http.get('/users', async ({ request }) => {
     const url = new URL(request.url);
 
-    const queryString = url.searchParams.get('query');
-    const query = queryString ? queryString : '';
-    const pageNoString = url.searchParams.get('pageNo');
-    const pageSizeString = url.searchParams.get('pageSize');
-
-    const pageNo = pageNoString ? parseInt(pageNoString) : 1;
-    const pageSize = pageSizeString ? parseInt(pageSizeString) : 10;
+    const query = url.searchParams.get('query') ? (url.searchParams.get('query') as string) : '';
+    const pageNo = url.searchParams.get('pageNo')
+      ? parseInt(url.searchParams.get('pageNo') as string)
+      : 1;
+    const pageSize = url.searchParams.get('pageSize')
+      ? parseInt(url.searchParams.get('pageSize') as string)
+      : 10;
 
     const result = TEST_USERS.filter((user) => user.id.includes(query)).sort();
     const page = result.slice((pageNo - 1) * pageSize, pageNo * pageSize).map(toProfile);
@@ -43,9 +44,7 @@ export const userHandlers = [
 
     const target = TEST_USERS.find((user) => user.id == userId);
 
-    if (target) {
-      return HttpResponse.json(toProfile(target), { status: 200 });
-    } else {
+    if (!target) {
       return HttpResponse.json(
         {
           error: 'NO_USER',
@@ -54,6 +53,8 @@ export const userHandlers = [
         { status: 404 },
       );
     }
+
+    return HttpResponse.json(toProfile(target), { status: 200 });
   }),
 
   http.get('/users/:userId/bookmarks', async ({ request, params }) => {
@@ -61,30 +62,16 @@ export const userHandlers = [
 
     const { userId } = params;
 
-    const pageNoString = url.searchParams.get('pageNo');
-    const pageSizeString = url.searchParams.get('pageSize');
-
-    const pageNo = pageNoString ? parseInt(pageNoString) : 1;
-    const pageSize = pageSizeString ? parseInt(pageSizeString) : 10;
+    const pageNo = url.searchParams.get('pageNo')
+      ? parseInt(url.searchParams.get('pageNo') as string)
+      : 1;
+    const pageSize = url.searchParams.get('pageSize')
+      ? parseInt(url.searchParams.get('pageSize') as string)
+      : 10;
 
     const target = TEST_USERS.find((user) => user.id == userId);
 
-    if (target) {
-      const page = TEST_BOOKMARKS.slice((pageNo - 1) * pageSize, pageNo * pageSize);
-
-      return HttpResponse.json(page, {
-        status: 200,
-        headers: {
-          'X-Pagination-Page': pageNo.toString(),
-          'X-Pagination-Page-Limit': pageSize.toString(),
-          'X-Pagination-Page-Size': page.length.toString(),
-          'X-Pagination-Total-Page': (
-            Math.floor((TEST_BOOKMARKS.length - 1) / pageSize) + 1
-          ).toString(),
-          'X-Pagination-Total-Item': TEST_BOOKMARKS.length.toString(),
-        },
-      });
-    } else {
+    if (!target) {
       return HttpResponse.json(
         {
           error: 'NO_USER',
@@ -93,6 +80,21 @@ export const userHandlers = [
         { status: 404 },
       );
     }
+
+    const page = TEST_BOOKMARKS.slice((pageNo - 1) * pageSize, pageNo * pageSize);
+
+    return HttpResponse.json(page, {
+      status: 200,
+      headers: {
+        'X-Pagination-Page': pageNo.toString(),
+        'X-Pagination-Page-Limit': pageSize.toString(),
+        'X-Pagination-Page-Size': page.length.toString(),
+        'X-Pagination-Total-Page': (
+          Math.floor((TEST_BOOKMARKS.length - 1) / pageSize) + 1
+        ).toString(),
+        'X-Pagination-Total-Item': TEST_BOOKMARKS.length.toString(),
+      },
+    });
   }),
 
   http.post('/users/:userId/bookmarks', async ({ request }) => {
@@ -130,6 +132,34 @@ export const userHandlers = [
     );
   }),
 
+  http.get('/users/:userId/bookmarks/:tourSpotId', async ({ params }) => {
+    const { userId, tourSpotId } = params;
+
+    const targetBookmark = TEST_BOOKMARKS.findIndex(
+      (bookmark) => bookmark.tourSpotId == tourSpotId,
+    );
+
+    if (targetBookmark == -1) {
+      return HttpResponse.json(
+        {
+          error: 'NO_TOUR_SPOT',
+          message: '관광지ID(tourSpotId)에 해당하는 관광지가 존재하지 않습니다.',
+        },
+        { status: 404 },
+      );
+    }
+
+    TEST_BOOKMARKS.splice(targetBookmark, 1);
+
+    return HttpResponse.json(
+      {
+        userId: userId,
+        tourSpotId: TEST_BOOKMARKS[targetBookmark].tourSpotId,
+      },
+      { status: 200 },
+    );
+  }),
+
   http.delete('/users/:userId/bookmarks/:tourSpotId', async ({ params }) => {
     if (!AUTHORIZED) {
       return HttpResponse.json(
@@ -153,9 +183,10 @@ export const userHandlers = [
       );
     }
 
-    const targetUser = TEST_USERS.findIndex((user) => user.id == userId);
+    const targetUser = TEST_USERS.find((user) => user.id == userId);
+    console.log(userId, targetUser);
 
-    if (targetUser != -1) {
+    if (!targetUser) {
       return HttpResponse.json(
         {
           error: 'NO_USER',
@@ -169,11 +200,7 @@ export const userHandlers = [
       (bookmark) => bookmark.tourSpotId == tourSpotId,
     );
 
-    if (targetBookmark != -1) {
-      TEST_BOOKMARKS.splice(targetBookmark, 1);
-
-      return new HttpResponse(null, { status: 204 });
-    } else {
+    if (targetBookmark == -1) {
       return HttpResponse.json(
         {
           error: 'NO_TOUR_SPOT',
@@ -182,5 +209,47 @@ export const userHandlers = [
         { status: 404 },
       );
     }
+
+    TEST_BOOKMARKS.splice(targetBookmark, 1);
+
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.get('/users/:userId/tour-spot-reviews/likes', async ({ request, params }) => {
+    const { userId } = params;
+
+    const url = new URL(request.url);
+
+    const tourSpotReviewIds = url.searchParams.getAll('tourSpotReviewIds');
+
+    const targetUser = TEST_USERS.find((user) => user.id == userId);
+
+    if (!targetUser) {
+      return HttpResponse.json(
+        {
+          error: 'NO_USER',
+          message: '회원ID(userId)에 해당하는 사용자가 존재하지 않습니다.',
+        },
+        { status: 404 },
+      );
+    }
+
+    const result: Pick<TourSpotReviewLike, 'tourSpotReviewId' | 'liked'>[] = [];
+
+    for (const tourSpotReviewId of tourSpotReviewIds) {
+      if (TEST_TOUR_SPOT_REVIEW_LIKES.some((like) => like.tourSpotReviewId == tourSpotReviewId)) {
+        result.push({
+          tourSpotReviewId: tourSpotReviewId,
+          liked: true,
+        });
+      } else {
+        result.push({
+          tourSpotReviewId: tourSpotReviewId,
+          liked: false,
+        });
+      }
+    }
+
+    return HttpResponse.json(result, { status: 200 });
   }),
 ];

@@ -2,4 +2,10 @@
 export const AUTHORIZED = true;
 
 // 권한 종류
-export const AUTHORITY = ['REVIEW_POST', 'BOOKMARK_POST', 'BOOKMARK_DELETE'];
+export const AUTHORITY = [
+  'REVIEW_POST',
+  'BOOKMARK_POST',
+  'BOOKMARK_DELETE',
+  'REVIEW_LIKE_PUT',
+  'REVIEW_DELETE',
+];
