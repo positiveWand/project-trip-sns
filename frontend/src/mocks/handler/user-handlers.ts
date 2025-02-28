@@ -149,8 +149,6 @@ export const userHandlers = [
       );
     }
 
-    TEST_BOOKMARKS.splice(targetBookmark, 1);
-
     return HttpResponse.json(
       {
         userId: userId,
@@ -184,7 +182,6 @@ export const userHandlers = [
     }
 
     const targetUser = TEST_USERS.find((user) => user.id == userId);
-    console.log(userId, targetUser);
 
     if (!targetUser) {
       return HttpResponse.json(
