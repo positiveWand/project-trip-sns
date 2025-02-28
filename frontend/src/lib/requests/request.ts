@@ -14,6 +14,18 @@ export interface ErrorResponse<T> {
 
 export type Response<T, U> = SuccessResponse<T> | ErrorResponse<U>;
 
+export interface PageInfo {
+  page: number; // 페이지 번호
+  pageLimit: number; // 페이지 최대크기
+  pageSize: number; // 페이지 크기
+  totalPage: number; // 총 페이지 개수
+  totalItem: number; // 총 아이템 개수
+}
+
+export type Page<T> = PageInfo & {
+  data: T;
+};
+
 const SERVER_URL = '';
 const TIMEOUT = 5000;
 
@@ -21,12 +33,18 @@ export const apiClient = axios.create({
   baseURL: SERVER_URL,
   timeout: TIMEOUT,
   withCredentials: true,
+  paramsSerializer: {
+    indexes: null,
+  },
 });
 
 export const envelopeApiClient = axios.create({
   baseURL: SERVER_URL,
   timeout: TIMEOUT,
   withCredentials: true,
+  paramsSerializer: {
+    indexes: null,
+  },
 });
 
 envelopeApiClient.interceptors.response.use(
@@ -49,6 +67,27 @@ envelopeApiClient.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+export const paginationApiClient = axios.create({
+  baseURL: SERVER_URL,
+  timeout: TIMEOUT,
+  withCredentials: true,
+  paramsSerializer: {
+    indexes: null,
+  },
+});
+
+paginationApiClient.interceptors.response.use((response) => {
+  response.data = {
+    page: parseInt(response.headers['x-pagination-page']),
+    pageLimit: parseInt(response.headers['x-pagination-page-limit']),
+    pageSize: parseInt(response.headers['x-pagination-page-size']),
+    totalPage: parseInt(response.headers['x-pagination-total-page']),
+    totalItem: parseInt(response.headers['x-pagination-total-item']),
+    data: response.data,
+  };
+  return response;
+});
 
 export const defaultErrorHandler = (error: unknown): ErrorResponse<any> => {
   if (axios.isAxiosError(error)) {
