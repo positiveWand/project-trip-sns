@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { requestMe } from '@/lib/requests/request-auth';
 
 export interface User {
@@ -12,17 +11,16 @@ export interface UserSession {
   info: User | null;
 }
 
-const userSession: UserSession = {
+const USER_SESSION: UserSession = {
   active: false,
   info: null,
 };
 
 export async function checkSession() {
   const response = await requestMe();
-  console.log(response);
   if (response.success && response.data) {
-    userSession.active = true;
-    userSession.info = {
+    USER_SESSION.active = true;
+    USER_SESSION.info = {
       id: response.data.id,
       name: response.data.name,
       email: response.data.email,
@@ -31,6 +29,5 @@ export async function checkSession() {
 }
 
 export function useUserSession(): [boolean, User | null] {
-  console.log(userSession);
-  return [userSession.active, userSession.info];
+  return [USER_SESSION.active, USER_SESSION.info];
 }
