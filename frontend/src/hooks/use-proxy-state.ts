@@ -7,6 +7,7 @@ export async function IDENTITY_TRANSFORM<T>(value: T) {
 export function useProxyState<T, U>(
   state: T,
   transform: (state: T) => Promise<U | null>,
+  deps: React.DependencyList,
 ): [U | null, React.Dispatch<React.SetStateAction<U | null>>] {
   const [proxyState, setProxyState] = React.useState<U | null>(null);
 
@@ -14,7 +15,7 @@ export function useProxyState<T, U>(
     transform(state)
       .then((transformedState) => setProxyState(transformedState))
       .catch(() => setProxyState(null));
-  }, [state]);
+  }, [state, ...deps]);
 
   return [proxyState, setProxyState];
 }
