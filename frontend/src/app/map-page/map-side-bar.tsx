@@ -1,18 +1,22 @@
 import { cn } from '@/lib/utils';
-import { Searchbar } from './searchbar';
-import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
+import { Searchbar } from '@/components/searchbar';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Label } from '@radix-ui/react-label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { ArrowUpDown, RefreshCcw, SquareArrowRight } from 'lucide-react';
-import { Separator } from './ui/separator';
-import { Button } from './ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
 import { ComponentProps, useEffect, useMemo, useState } from 'react';
 import { useAllUrlSearchParam, useUrlPathParam, useUrlSearchParam } from '@/hooks/use-url';
-import { apiClient } from '@/lib/requests/request';
-import { Badge } from './ui/badge';
-import { Pagination } from './ui/pagination';
+import { Badge } from '@/components/ui/badge';
+import { Pagination } from '@/components/ui/pagination';
 import { useTourSpots } from '@/hooks/use-tour-spot';
-import { totalmem } from 'os';
 
 const CATEGORY_FILTER = [
   { name: '자연', value: 'nature' },

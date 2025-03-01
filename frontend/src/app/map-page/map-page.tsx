@@ -5,8 +5,8 @@ import Page from '@/components/layout/page';
 import { MapProvider } from '@/context/naver-map-context';
 import { Header } from '@/components/layout/header';
 import Main from '@/components/layout/main';
-import { MapSideBar } from '@/components/map-side-bar';
-import { Map } from '@/components/map';
+import { MapSideBar } from './map-side-bar';
+import { Map } from './map';
 import initApp from '@/init';
 import { Toaster } from '@/components/ui/toaster';
 

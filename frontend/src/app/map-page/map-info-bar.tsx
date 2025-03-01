@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { useState, ComponentProps, useRef, useEffect } from 'react';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 import {
   X,
   MapPin,
@@ -12,9 +12,9 @@ import {
   Share2,
   EllipsisVertical,
 } from 'lucide-react';
-import { Toggle } from './ui/toggle';
-import { Separator } from './ui/separator';
-import { Badge } from './ui/badge';
+import { Toggle } from '@/components/ui/toggle';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -25,10 +25,10 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Pagination } from '@/components/ui/pagination';
-import { Textarea } from './ui/textarea';
+import { Textarea } from '@/components/ui/textarea';
 import { TourSpot } from '@/hooks/use-tour-spot';
 import { useTourSpotReviews } from '@/hooks/use-tour-spot-review';
-import { Skeleton } from './ui/skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { useUserSession } from '@/hooks/use-user-session';
 import {
