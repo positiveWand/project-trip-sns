@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import Page from '@/components/layout/page';
 import { Header } from '@/components/layout/header';
 import Main from '@/components/layout/main';
-import UserSettings from '@/components/user-settings';
+import UserSettings from './user-settings';
 import initApp from '@/init';
 
 await initApp();
@@ -25,9 +25,9 @@ function MyPage() {
 }
 
 createRoot(document.getElementById('root')!).render(
-  // <StrictMode>
-  <MyPage />,
-  // </StrictMode>,
+  <StrictMode>
+    <MyPage />,
+  </StrictMode>,
 );
 
 export default MyPage;

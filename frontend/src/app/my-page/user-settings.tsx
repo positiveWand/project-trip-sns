@@ -1,10 +1,10 @@
 import { cn } from '@/lib/utils';
 import { ComponentProps, useEffect, useState } from 'react';
-import { Separator } from './ui/separator';
-import { Form, FormInput } from './ui/form';
+import { Separator } from '@/components/ui/separator';
+import { Form, FormInput } from '@/components/ui/form';
 import { Label } from '@radix-ui/react-label';
-import { InputChangeAction } from './ui/form';
-import { Button } from './ui/button';
+import { InputChangeAction } from '@/components/ui/form';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
