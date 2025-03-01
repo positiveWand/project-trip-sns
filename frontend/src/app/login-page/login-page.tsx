@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '@/styles/index.css';
-import { LoginForm } from '@/components/login-form';
+import { LoginForm } from './login-form';
 import { Toaster } from '@/components/ui/toaster';
 import Page from '@/components/layout/page';
 import { Header } from '@/components/layout/header';
