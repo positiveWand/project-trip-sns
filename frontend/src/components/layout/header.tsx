@@ -18,10 +18,6 @@ export interface HeaderProps extends React.ComponentProps<'header'> {}
 
 const NAVIGATION_LINKS = [
   {
-    name: '홈',
-    url: MAIN_PAGE,
-  },
-  {
     name: '지도',
     url: MAP_PAGE,
   },
