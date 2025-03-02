@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { TEST_USERS, User, Bookmark, TEST_BOOKMARKS } from '../database/user';
 import { AUTHORITY, AUTHORIZED } from '../config';
 import { TEST_TOUR_SPOT_REVIEW_LIKES, TourSpotReviewLike } from '../database/tour-spot-review';
+import { TEST_TOUR_SPOTS, TourSpot } from '../database/tour-spot';
 
 type Profile = Pick<User, 'id' | 'name'>;
 
@@ -10,6 +11,35 @@ function toProfile(user: User): Profile {
     id: user.id,
     name: user.name,
   };
+}
+
+type TourSpotOverview = Omit<TourSpot, 'description' | 'phoneNumber' | 'reviews'>;
+
+function toOverview(tourSpot: TourSpot): TourSpotOverview {
+  return {
+    id: tourSpot.id,
+    name: tourSpot.name,
+    address: tourSpot.address,
+    lat: tourSpot.lat,
+    lng: tourSpot.lng,
+    imageUrl: tourSpot.imageUrl,
+    tags: tourSpot.tags.map(tagView),
+  };
+}
+
+function tagView(tag: string) {
+  const map: Record<string, string> = {
+    nature: '자연',
+    history: '역사',
+    rest: '휴양',
+    experience: '체험',
+    industry: '산업',
+    architecture: '건축/조형',
+    culture: '문화',
+    festival: '축제',
+    concert: '공연/행사',
+  };
+  return map[tag];
 }
 
 export const userHandlers = [
@@ -81,7 +111,15 @@ export const userHandlers = [
       );
     }
 
-    const page = TEST_BOOKMARKS.slice((pageNo - 1) * pageSize, pageNo * pageSize);
+    const bookmarks = TEST_BOOKMARKS.slice((pageNo - 1) * pageSize, pageNo * pageSize);
+    const page = bookmarks.map((bookmark) => {
+      return {
+        ...bookmark,
+        tourSpotOverview: {
+          ...toOverview(TEST_TOUR_SPOTS.find((tourSpot) => tourSpot.id == bookmark.tourSpotId)!),
+        },
+      };
+    });
 
     return HttpResponse.json(page, {
       status: 200,
@@ -121,6 +159,7 @@ export const userHandlers = [
     }
 
     TEST_BOOKMARKS.push({
+      userId: '',
       tourSpotId: bookmarkRequest.tourSpotId,
     });
 
