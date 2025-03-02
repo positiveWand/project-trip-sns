@@ -6,6 +6,7 @@ export interface User {
 }
 
 export interface Bookmark {
+  userId: string;
   tourSpotId: string;
 }
 
@@ -49,14 +50,14 @@ export const TEST_USERS: User[] = [
 ];
 
 export const TEST_BOOKMARKS: Bookmark[] = [
-  { tourSpotId: '1918643' },
-  { tourSpotId: '1918421' },
-  { tourSpotId: '2819599' },
-  { tourSpotId: '1926379' },
-  { tourSpotId: '1621165' },
-  { tourSpotId: '3008007' },
-  { tourSpotId: '988441' },
-  { tourSpotId: '1621118' },
-  { tourSpotId: '2778809' },
-  { tourSpotId: '1556005' },
+  { userId: '', tourSpotId: '1918643' },
+  { userId: '', tourSpotId: '1918421' },
+  { userId: '', tourSpotId: '2819599' },
+  { userId: '', tourSpotId: '1926379' },
+  { userId: '', tourSpotId: '1621165' },
+  { userId: '', tourSpotId: '3008007' },
+  { userId: '', tourSpotId: '988441' },
+  { userId: '', tourSpotId: '1621118' },
+  { userId: '', tourSpotId: '2778809' },
+  { userId: '', tourSpotId: '1556005' },
 ];
