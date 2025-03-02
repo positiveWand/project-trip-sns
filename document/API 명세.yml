@@ -503,12 +503,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        "401":
-          description: 북마크 조회에 실패했습니다. 조회를 위해서는 인증이 필요합니다.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
         "404":
           description: 북마크 조회에 실패했습니다. 회원이 존재하지 않거나, 북마크에 관광지가 존재하지 않습니다.
           content:
@@ -578,12 +572,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    tourSpotReviewId:
-                      type: string
-                    liked:
-                      type: boolean
+                  $ref: "#/components/schemas/TourSpotReviewLike"
         "400":
           description: 관광지 후기 공감 여부 모음 조회에 실패했습니다. 요청 형태가 유효하지 않습니다.
           content:
@@ -611,6 +600,13 @@ paths:
           items:
             type: string
         description: 관광지 태그 모음
+      - in: query
+        name: customFilters
+        schema:
+          type: array
+          items:
+            type: string
+        description: 사용자 맞춤 필터
       - in: query
         name: sort
         schema:
@@ -640,7 +636,7 @@ paths:
       tags:
         - 관광지
       summary: 검색 조건에 부합하는 관광지 모음 조회
-      description: 검색 조건(tags, sort)에 부합하는 관광지들을 조회합니다.
+      description: 검색 조건(query, tags, customFilters, sort)에 부합하는 관광지들을 조회합니다.
       responses:
         "200":
           description: 관광지 모음 조회에 성공했습니다.
@@ -677,6 +673,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        "401":
+          description: 관광지 모음 조회에 실패했습니다. 사용자 맞춤 필터 사용을 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "422":
           description: 관광지 모음 조회에 실패했습니다. 검색 조건(tags, sort) 또는 페이지 파라미터(pageNo, pageSize)가 적절하지 않습니다.
           content:
@@ -1068,6 +1070,33 @@ components:
           readOnly: true
         tourSpotId:
           type: string
+        tourSpotOverview:
+          type: object
+          properties:
+            name:
+              type: string
+            address:
+              type: string
+            lat:
+              type: number
+              minimum: -90
+              maximum: 90
+            lng:
+              type: number
+              minimum: -180
+              maximum: 180
+            imageUrl:
+              type: string
+              format: url
+            description:
+              type: string
+            phoneNumber:
+              type: string
+            tags:
+              type: array
+              items:
+                type: string
+          readOnly: true
       required:
         - userId
         - tourSpotId
