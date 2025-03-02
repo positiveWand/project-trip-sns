@@ -30,7 +30,12 @@ const NAVIGATION_LINKS = [
 function Header({ className }: HeaderProps) {
   const [sessionIsActive, user] = useUserSession();
   return (
-    <header className={cn('w-full border-b border-border/50 px-5 py-3 flex bg-primary', className)}>
+    <header
+      className={cn(
+        'w-full border-b border-border/50 px-5 py-3 flex bg-primary sticky top-0 z-50',
+        className,
+      )}
+    >
       <div className='flex text-primary-foreground'>
         <MainLogo href={MAIN_PAGE} className='mr-4' />
 
