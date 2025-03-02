@@ -44,7 +44,14 @@ export const recommendationHandlers = [
       );
     }
 
-    const result = TEST_TOUR_SPOTS.slice(0, 5).map(toOverview);
+    let result = [];
+
+    for (let i = 0; i < 4; i++) {
+      const randomIndex = Math.floor(Math.random() * (TEST_TOUR_SPOTS.length - 1));
+      result.push(TEST_TOUR_SPOTS[randomIndex]);
+    }
+
+    result = result.map(toOverview);
 
     return HttpResponse.json(result, { status: 200 });
   }),
