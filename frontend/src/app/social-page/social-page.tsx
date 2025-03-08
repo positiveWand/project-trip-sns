@@ -12,7 +12,7 @@ import { HeadingContainer, Heading3Title, HeadingDescription } from '@/component
 import { UserBookmark } from './user-bookmark';
 import { useUser } from '@/hooks/use-user';
 
-await initApp();
+initApp();
 
 function SocialPage() {
   const [{ userId }, setPathParam] = useUrlPathParam('/social/user/:userId');

@@ -8,7 +8,7 @@ import { Header } from '@/components/layout/header';
 import Main from '@/components/layout/main';
 import initApp from '@/init';
 
-await initApp();
+initApp();
 
 function SignupPage() {
   return (
