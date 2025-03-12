@@ -39,8 +39,8 @@ public class PaginationAspect {
         }
 
         response.setHeader("X-Pagination-Page", String.valueOf(page.getNumber()));
-        response.setHeader("X-Pagination-Page-Size", String.valueOf(page.getSize()));
-        response.setHeader("X-Pagination-Page-Limit", String.valueOf(page.getNumberOfElements()));
+        response.setHeader("X-Pagination-Page-Size", String.valueOf(page.getNumberOfElements()));
+        response.setHeader("X-Pagination-Page-Limit", String.valueOf(page.getSize()));
         response.setHeader("X-Pagination-Total-Page", String.valueOf(page.getTotalPages()));
         response.setHeader("X-Pagination-Total-Item", String.valueOf(page.getTotalElements()));
 
