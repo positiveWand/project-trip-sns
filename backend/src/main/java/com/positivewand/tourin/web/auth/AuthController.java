@@ -1,5 +1,7 @@
 package com.positivewand.tourin.web.auth;
 
+import com.positivewand.tourin.domain.auth.CustomUserDetails;
+import com.positivewand.tourin.domain.auth.CustomUserDetailsService;
 import com.positivewand.tourin.domain.user.UserService;
 import com.positivewand.tourin.web.auth.request.UpdatePasswordRequest;
 import com.positivewand.tourin.web.auth.request.LoginRequest;
@@ -27,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
@@ -89,7 +91,7 @@ public class AuthController {
     @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
     public UserResponse me() {
-        CustomUserDetails user = this.getCurrentContextUser();
+        CustomUserDetails user = customUserDetailsService.getCurrentContextUser();
 
         return new UserResponse(user.getUsername(), user.getName(), user.getEmail());
     }
@@ -100,7 +102,7 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        CustomUserDetails user = this.getCurrentContextUser();
+        CustomUserDetails user = customUserDetailsService.getCurrentContextUser();
 
         userService.deleteUser(user.getUsername());
         securityContextLogoutHandler.logout(request, response, null);
@@ -115,7 +117,7 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        CustomUserDetails user = this.getCurrentContextUser();
+        CustomUserDetails user = customUserDetailsService.getCurrentContextUser();
         String newName = updateProfileRequest.name();
         String newEmail = updateProfileRequest.email();
 
@@ -130,7 +132,7 @@ public class AuthController {
     @PostMapping("/update-password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updatePassword(@RequestBody UpdatePasswordRequest updatePasswordRequest) {
-        CustomUserDetails user = this.getCurrentContextUser();
+        CustomUserDetails user = customUserDetailsService.getCurrentContextUser();
         String oldPassword = updatePasswordRequest.oldPassword();
         String newPassword = updatePasswordRequest.newPassword();
 
@@ -140,11 +142,5 @@ public class AuthController {
         }
 
         userService.changePassword(user.getUsername(), passwordEncoder.encode(newPassword));
-    }
-
-    private CustomUserDetails getCurrentContextUser() {
-        SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
-        SecurityContext context = securityContextHolderStrategy.getContext();
-        return (CustomUserDetails) context.getAuthentication().getPrincipal();
     }
 }

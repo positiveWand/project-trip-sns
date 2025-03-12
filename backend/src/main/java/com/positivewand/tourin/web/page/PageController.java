@@ -1,6 +1,6 @@
 package com.positivewand.tourin.web.page;
 
-import com.positivewand.tourin.web.auth.CustomUserDetails;
+import com.positivewand.tourin.domain.auth.CustomUserDetails;
 import com.positivewand.tourin.web.exception.RedirectException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

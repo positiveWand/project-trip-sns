@@ -1,4 +1,4 @@
-package com.positivewand.tourin.web.auth;
+package com.positivewand.tourin.domain.auth;
 
 import com.positivewand.tourin.domain.user.entity.User;
 import lombok.AllArgsConstructor;

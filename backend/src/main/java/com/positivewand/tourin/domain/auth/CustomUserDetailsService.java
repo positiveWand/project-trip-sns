@@ -1,8 +1,11 @@
-package com.positivewand.tourin.web.auth;
+package com.positivewand.tourin.domain.auth;
 
 import com.positivewand.tourin.domain.user.UserRepository;
 import com.positivewand.tourin.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,5 +25,11 @@ public class CustomUserDetailsService  implements UserDetailsService {
         }
 
         return CustomUserDetails.createFromUser(user.get());
+    }
+
+    public CustomUserDetails getCurrentContextUser() {
+        SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
+        SecurityContext context = securityContextHolderStrategy.getContext();
+        return (CustomUserDetails) context.getAuthentication().getPrincipal();
     }
 }
