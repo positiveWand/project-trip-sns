@@ -35,7 +35,13 @@ public class TourSpotReviewService {
                 PageRequest.of(page, size, Sort.by("createdAt").descending())
         );
 
-        return tourSpotReviews.map(TourSpotReviewDto::createFromEntity);
+        return tourSpotReviews.map(entity -> new TourSpotReviewDto(
+                entity.getId(),
+                entity.getTourSpot().getId(),
+                entity.getUser().getUsername(),
+                entity.getContent(),
+                tourSpotReviewRepository.countById(entity.getId())
+        ));
     }
 
     @Transactional

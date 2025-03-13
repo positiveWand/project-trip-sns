@@ -6,14 +6,16 @@ public record TourSpotReviewDto(
     Long id,
     Long tourSpotId,
     String username,
-    String content
+    String content,
+    Long likes
 ) {
     public static TourSpotReviewDto createFromEntity(TourSpotReview tourSpotReview) {
         return new TourSpotReviewDto(
             tourSpotReview.getId(),
             tourSpotReview.getTourSpot().getId(),
             tourSpotReview.getUser().getUsername(),
-            tourSpotReview.getContent()
+            tourSpotReview.getContent(),
+            0L
         );
     }
 }

@@ -15,7 +15,7 @@ public record TourSpotReviewResponse(
                 tourSpotReview.tourSpotId().toString(),
                 tourSpotReview.username(),
                 tourSpotReview.content(),
-                0L
+                tourSpotReview.likes()
         );
     }
 }
