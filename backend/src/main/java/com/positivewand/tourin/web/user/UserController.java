@@ -2,6 +2,7 @@ package com.positivewand.tourin.web.user;
 
 import com.positivewand.tourin.domain.auth.CustomUserDetails;
 import com.positivewand.tourin.domain.auth.CustomUserDetailsService;
+import com.positivewand.tourin.domain.tourspot.TourSpotReviewLikeService;
 import com.positivewand.tourin.domain.user.BookmarkService;
 import com.positivewand.tourin.domain.user.dto.BookmarkDto;
 import com.positivewand.tourin.domain.user.dto.UserDto;
@@ -9,6 +10,7 @@ import com.positivewand.tourin.domain.user.UserService;
 import com.positivewand.tourin.web.aop.PaginationAspect.PaginationHeader;
 import com.positivewand.tourin.web.user.request.AddBookmarkRequest;
 import com.positivewand.tourin.web.user.response.BookmarkResponse;
+import com.positivewand.tourin.web.user.response.TourSpotReviewLikeResponse;
 import com.positivewand.tourin.web.user.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,7 +18,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -24,6 +28,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final BookmarkService bookmarkService;
+    private final TourSpotReviewLikeService tourSpotReviewLikeService;
     private final CustomUserDetailsService userDetailsService;
 
     @GetMapping("/users")
@@ -101,5 +106,25 @@ public class UserController {
         }
         
         bookmarkService.deleteBookmark(userId, tourSpotId);
+    }
+
+    @GetMapping("/users/{userId}/tour-spot-reviews/likes")
+    @ResponseStatus(HttpStatus.OK)
+    public List<TourSpotReviewLikeResponse> checkTourSpotReviewLike(
+            @PathVariable(name = "userId") String userId,
+            @RequestParam(name = "tourSpotReviewIds") List<Long> tourSpotReviewIds
+    ) {
+        Map<Long, Boolean> checkResult = tourSpotReviewLikeService.checkLikes(userId, tourSpotReviewIds);
+
+        List<TourSpotReviewLikeResponse> response = new ArrayList<>();
+        for (Long tourSpotReviewId: tourSpotReviewIds) {
+            response.add(new TourSpotReviewLikeResponse(
+                    userId,
+                    tourSpotReviewId.toString(),
+                    checkResult.get(tourSpotReviewId)
+            ));
+        }
+
+        return response;
     }
 }

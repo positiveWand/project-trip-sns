@@ -1,5 +1,8 @@
 package com.positivewand.tourin.web.tourspot;
 
+import com.positivewand.tourin.domain.auth.CustomUserDetails;
+import com.positivewand.tourin.domain.auth.CustomUserDetailsService;
+import com.positivewand.tourin.domain.tourspot.TourSpotReviewLikeService;
 import com.positivewand.tourin.domain.tourspot.TourSpotReviewService;
 import com.positivewand.tourin.domain.tourspot.TourSpotService;
 import com.positivewand.tourin.domain.tourspot.dto.TourSpotDto;
@@ -7,13 +10,16 @@ import com.positivewand.tourin.domain.tourspot.dto.TourSpotReviewDto;
 import com.positivewand.tourin.domain.tourspot.entity.TourSpotReview;
 import com.positivewand.tourin.web.aop.PaginationAspect.PaginationHeader;
 import com.positivewand.tourin.web.tourspot.request.AddTourSpotReviewRequest;
+import com.positivewand.tourin.web.tourspot.request.PutTourSpotReviewLikeRequest;
 import com.positivewand.tourin.web.tourspot.response.TourSpotOverviewResponse;
 import com.positivewand.tourin.web.tourspot.response.TourSpotResponse;
+import com.positivewand.tourin.web.tourspot.response.TourSpotReviewLikeResponse;
 import com.positivewand.tourin.web.tourspot.response.TourSpotReviewResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +30,8 @@ import java.util.List;
 public class TourSpotController {
     private final TourSpotService tourSpotService;
     private final TourSpotReviewService tourSpotReviewService;
+    private final TourSpotReviewLikeService tourSpotReviewLikeService;
+    private final CustomUserDetailsService userDetailsService;
 
     @GetMapping("/tour-spots")
     @PaginationHeader
@@ -108,5 +116,34 @@ public class TourSpotController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTourSpotReview(@PathVariable(name = "tourSpotReviewId") Long tourSpotReviewId) {
         tourSpotReviewService.deleteTourSpotReview(tourSpotReviewId);
+    }
+
+    @PutMapping("/tour-spot-reviews/{tourSpotReviewId}/likes")
+    @ResponseStatus(HttpStatus.OK)
+    public TourSpotReviewLikeResponse putTourSpotReviewLike(
+            @PathVariable(name = "tourSpotReviewId") Long tourSpotReviewId,
+            @RequestBody PutTourSpotReviewLikeRequest putTourSpotReviewLikeRequest
+    ) {
+        CustomUserDetails userDetails = userDetailsService.getCurrentContextUser();
+
+        if(!userDetails.getUsername().equals(putTourSpotReviewLikeRequest.userId())) {
+            throw new AccessDeniedException("회원은 자신의 북마크만 삭제할 수 있습니다.");
+        }
+
+        if(putTourSpotReviewLikeRequest.liked()) {
+            tourSpotReviewLikeService.addReviewLike(putTourSpotReviewLikeRequest.userId(), tourSpotReviewId);
+            return new TourSpotReviewLikeResponse(
+                    userDetails.getUsername(),
+                    tourSpotReviewId.toString(),
+                    true
+            );
+        } else {
+            tourSpotReviewLikeService.deleteReviewLike(putTourSpotReviewLikeRequest.userId(), tourSpotReviewId);
+            return new TourSpotReviewLikeResponse(
+                    userDetails.getUsername(),
+                    tourSpotReviewId.toString(),
+                    false
+            );
+        }
     }
 }
