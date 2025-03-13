@@ -57,7 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users", "/api/users/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tour-spots", "/api/tour-spots/**").permitAll()
                         .requestMatchers("/api/tour-spots/**", "/api/tour-spot-reviews/**").authenticated()
-                        .requestMatchers("/api/recommendation/**").authenticated()
+                        .requestMatchers("/api/recommendations/**").authenticated()
                 )
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler(accessDeniedHandler)
