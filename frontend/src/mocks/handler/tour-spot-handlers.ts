@@ -120,6 +120,61 @@ export const tourSpotHandlers = [
     });
   }),
 
+  http.get('/tour-spots/map', async ({ request }) => {
+    const url = new URL(request.url);
+
+    const query = url.searchParams.get('query');
+    const tags = url.searchParams.getAll('tags');
+    const customFilters = url.searchParams.getAll('customFilters');
+    const minLat = parseFloat(url.searchParams.get('minLat')!);
+    const minLng = parseFloat(url.searchParams.get('minLng')!);
+    const maxLat = parseFloat(url.searchParams.get('maxLat')!);
+    const maxLng = parseFloat(url.searchParams.get('maxLng')!);
+
+    let result = TEST_TOUR_SPOTS.filter((tourSpot) => {
+      if (tags.length == 0) {
+        return true;
+      }
+
+      for (const tag of tags) {
+        if (tourSpot.tags.includes(tag)) {
+          return true;
+        }
+      }
+      return false;
+    });
+
+    if (customFilters.length > 0 && AUTHORIZED && customFilters.includes('bookmark')) {
+      result = result.filter((tourSpot) =>
+        TEST_BOOKMARKS.some((bookmark) => bookmark.tourSpotId == tourSpot.id),
+      );
+    } else if (!AUTHORIZED) {
+      return HttpResponse.json(
+        {
+          error: 'UNAUTHORIZED',
+          message: '인증이 필요합니다.',
+        },
+        { status: 401 },
+      );
+    }
+
+    if (query) {
+      result = result.filter((tourSpot) => tourSpot.name.includes(query));
+    }
+
+    result = result.filter(
+      (tourSpot) =>
+        minLat <= tourSpot.lat &&
+        tourSpot.lat <= maxLat &&
+        minLng <= tourSpot.lng &&
+        tourSpot.lng <= maxLng,
+    );
+
+    return HttpResponse.json(result, {
+      status: 200,
+    });
+  }),
+
   http.get('/tour-spots/:tourSpotId', async ({ params }) => {
     const { tourSpotId } = params;
 
