@@ -1,17 +1,17 @@
 import { MapInfoBar } from './map-info-bar';
 import { cn } from '@/lib/utils';
 import { useEffect, useRef, useState, ComponentProps, Reducer } from 'react';
-import { useNaverMap, useNaverMapAction } from '@/hooks/use-naver-map';
+import { useFocusedMarker, useMap, useMarkers } from '@/hooks/use-map';
 import {
   useAllUrlSearchParam,
   useChangeUrl,
   useUrlPathParam,
   useUrlSearchParam,
 } from '@/hooks/use-url';
-import { useTourSpot, useTourSpots } from '@/hooks/use-tour-spot';
+import { LatLngBound, useMapTourSpots, useTourSpot, useTourSpots } from '@/hooks/use-tour-spot';
 import { MAP_PAGE } from '@/config';
 
-// Configuration 상수
+// 지도 config
 const INIT_CENTER = new naver.maps.LatLng(33.37521429272602, 126.53454937152777);
 const INIT_ZOOM = 10;
 const FOCUS_ZOOM = 12;
@@ -19,37 +19,84 @@ const FOCUS_ZOOM = 12;
 export interface MapProps extends ComponentProps<'div'> {}
 
 export function Map({ className }: MapProps) {
-  const map = useNaverMap();
-  const naverMapAction = useNaverMapAction();
+  const [map, dispatchMap] = useMap();
+  const [focusedMarker, dispatchFocusedMarker] = useFocusedMarker();
+  const [markers, dispatchMarkers] = useMarkers();
   const mapContainer = useRef<HTMLDivElement>(null);
 
   const [query] = useUrlSearchParam('query', '');
   const [tags] = useAllUrlSearchParam('tags');
   const [customFilters] = useAllUrlSearchParam('customFilters');
-  const [{ focusedTourSpotId }, setPathParam] = useUrlPathParam('/tourSpot/:focusedTourSpotId');
+  const [{ focusedTourSpotId }, setPathParam] = useUrlPathParam(
+    MAP_PAGE + '/tourSpot/:focusedTourSpotId',
+  );
 
-  const [tourSpots] = useTourSpots(query, tags, customFilters, undefined, 1, 100);
+  const [latLngBound, setLatLngBound] = useState<LatLngBound>();
+
+  const [tourSpots] = useMapTourSpots(query, tags, customFilters, latLngBound);
   const [focusedTourSpot] = useTourSpot(focusedTourSpotId);
-
-  const [markers, setMarkers] = useState<Record<string, naver.maps.Marker>>({});
-  const [focusedMarker, setFocusedMarker] = useState<naver.maps.Marker | null>(null);
 
   const changeUrl = useChangeUrl(MAP_PAGE, true);
 
   useEffect(() => {
-    const newMap = new naver.maps.Map(mapContainer.current!, {
+    if (!mapContainer.current) return;
+
+    const newMap = new naver.maps.Map(mapContainer.current, {
       center: INIT_CENTER,
       zoom: INIT_ZOOM,
     });
 
-    naverMapAction({
+    dispatchMap({
       type: 'INIT_MAP',
       map: newMap,
+      mapDiv: mapContainer.current,
+    });
+
+    const bound = newMap.getBounds();
+    setLatLngBound({
+      minLat: bound.minY(),
+      minLng: bound.minX(),
+      maxLat: bound.maxY(),
+      maxLng: bound.maxX(),
+    });
+
+    let debounceTimer: NodeJS.Timeout;
+    let dragging = false;
+    newMap.addListener('dragstart', () => {
+      dragging = true;
+    });
+    newMap.addListener('dragend', () => {
+      clearTimeout(debounceTimer);
+      dragging = false;
+
+      const bound = newMap.getBounds();
+      setLatLngBound({
+        minLat: bound.minY(),
+        minLng: bound.minX(),
+        maxLat: bound.maxY(),
+        maxLng: bound.maxX(),
+      });
+    });
+    newMap.addListener('bounds_changed', () => {
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
+      }
+
+      debounceTimer = setTimeout(() => {
+        if (dragging) return;
+
+        const bound = newMap.getBounds();
+        setLatLngBound({
+          minLat: bound.minY(),
+          minLng: bound.minX(),
+          maxLat: bound.maxY(),
+          maxLng: bound.maxX(),
+        });
+      }, 300);
     });
 
     return () => {
-      newMap.destroy();
-      naverMapAction({
+      dispatchMap({
         type: 'DESTROY_MAP',
       });
     };
@@ -57,27 +104,34 @@ export function Map({ className }: MapProps) {
 
   useEffect(() => {
     if (!map || !focusedTourSpot) {
-      focusedMarker?.setMap(null);
+      dispatchFocusedMarker({
+        type: 'REMOVE_FOCUSED_MARKER',
+      });
       return;
     }
 
-    const focusCoord = new naver.maps.LatLng(focusedTourSpot.lat, focusedTourSpot.lng);
-
-    map.morph(focusCoord, FOCUS_ZOOM);
-
-    const marker = new naver.maps.Marker({
-      position: focusCoord,
-      map: map,
-      animation: naver.maps.Animation.BOUNCE,
-      zIndex: 100,
+    dispatchMap({
+      type: 'MORPH_MAP',
+      coord: {
+        lat: focusedTourSpot.lat,
+        lng: focusedTourSpot.lng,
+      },
+      zoom: FOCUS_ZOOM,
     });
 
-    focusedMarker?.setMap(null);
-    setFocusedMarker(marker);
+    dispatchFocusedMarker({
+      type: 'SET_FOCUSED_MARKER',
+      markerId: focusedTourSpot.id,
+      position: {
+        lat: focusedTourSpot.lat,
+        lng: focusedTourSpot.lng,
+      },
+    });
 
     return () => {
-      focusedMarker?.setMap(null);
-      setFocusedMarker(marker);
+      dispatchFocusedMarker({
+        type: 'REMOVE_FOCUSED_MARKER',
+      });
     };
   }, [map, focusedTourSpot]);
 
@@ -86,39 +140,27 @@ export function Map({ className }: MapProps) {
       return;
     }
 
-    Object.entries(markers).forEach(([tourSpotId, marker]) => {
-      if (tourSpotId == focusedTourSpotId || !marker) {
-        return;
-      }
-
-      marker.setMap(null);
-    });
-
-    tourSpots.data.forEach((tourSpot) => {
-      if (tourSpot.id == focusedTourSpotId) {
-        return;
-      }
-
-      const marker = new naver.maps.Marker({
-        position: new naver.maps.LatLng(tourSpot.lat, tourSpot.lng),
-        map: map,
-      });
-      markers[tourSpot.id] = marker;
-
-      naver.maps.Event.addListener(marker, 'click', () => {
-        setPathParam('focusedTourSpotId', tourSpot.id);
-      });
+    dispatchMarkers({
+      type: 'SET_MARKERS',
+      markers: tourSpots.map((tourSpot) => {
+        return {
+          id: tourSpot.id,
+          lat: tourSpot.lat,
+          lng: tourSpot.lng,
+          eventListener: {
+            eventName: 'click',
+            listener: () => {
+              setPathParam('focusedTourSpotId', tourSpot.id);
+            },
+          },
+        };
+      }),
     });
 
     return () => {
-      Object.entries(markers).forEach(([tourSpotId, marker]) => {
-        if (tourSpotId == focusedTourSpotId || !marker) {
-          return;
-        }
-
-        marker.setMap(null);
+      dispatchMarkers({
+        type: 'REMOVE_MARKERS',
       });
-      setMarkers({});
     };
   }, [map, tourSpots, focusedTourSpotId]);
 

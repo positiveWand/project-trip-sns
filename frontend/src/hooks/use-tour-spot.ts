@@ -20,6 +20,13 @@ export interface TourSpot {
 
 export type TourSpotOverview = Omit<TourSpot, 'description' | 'phoneNumber'>;
 
+export interface LatLngBound {
+  minLat: number;
+  minLng: number;
+  maxLat: number;
+  maxLng: number;
+}
+
 export function useTourSpots(
   query: string | undefined,
   tags: string[] | undefined,
@@ -58,6 +65,47 @@ export function useTourSpots(
         setLoading(false);
       });
   }, [query, tags, customFilters, sort, page, limit]);
+
+  return [tourSpots, error, loading];
+}
+
+export function useMapTourSpots(
+  query: string | undefined,
+  tags: string[] | undefined,
+  customFilters: string[] | undefined,
+  latLngBound: LatLngBound | undefined,
+): [TourSpotOverview[] | null, UseDataError | null, boolean] {
+  const [tourSpots, setTourSpots] = React.useState<TourSpotOverview[] | null>(null);
+  const [error, setError] = React.useState<UseDataError | null>(null);
+  const [loading, setLoading] = React.useState<boolean>(true);
+
+  React.useEffect(() => {
+    setLoading(true);
+
+    apiClient
+      .get<TourSpotOverview[] | UseDataError>('/tour-spots/map', {
+        params: {
+          query: query,
+          tags: tags,
+          customFilters: customFilters,
+          minLat: latLngBound?.minLat,
+          minLng: latLngBound?.minLng,
+          maxLat: latLngBound?.maxLat,
+          maxLng: latLngBound?.maxLng,
+        },
+      })
+      .then((response) => {
+        setTourSpots(response.data as TourSpotOverview[]);
+        setError(null);
+      })
+      .catch((error) => {
+        setTourSpots(null);
+        setError(error.response.data);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [query, tags, customFilters, latLngBound]);
 
   return [tourSpots, error, loading];
 }
