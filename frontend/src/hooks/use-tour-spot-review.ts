@@ -35,7 +35,7 @@ export function useTourSpotReviews(
     }
 
     paginationApiClient
-      .get<Page<TourSpotReview[]> | UseDataError>(`/tour-spots/${id}/reviews`, {
+      .get<Page<TourSpotReview[]> | UseDataError>(`/api/tour-spots/${id}/reviews`, {
         params: {
           pageNo: page,
           pageSize: limit,

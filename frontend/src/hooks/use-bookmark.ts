@@ -41,7 +41,7 @@ export function useUserBookmarks(
     }
 
     paginationApiClient
-      .get<Page<Bookmark[]> | UseDataError>(`/users/${userId}/bookmarks`, {
+      .get<Page<Bookmark[]> | UseDataError>(`/api/users/${userId}/bookmarks`, {
         params: {
           pageNo: page,
           pageSize: limit,
@@ -82,7 +82,7 @@ export function useIsBookmark(
     }
 
     envelopeApiClient
-      .get<Response<Bookmark, unknown>>(`/users/${userId}/bookmarks/${tourSpotId}`)
+      .get<Response<Bookmark, unknown>>(`/api/users/${userId}/bookmarks/${tourSpotId}`)
       .then((response) => {
         if (response.data.success) {
           setIsBookmark(true);

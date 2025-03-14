@@ -53,7 +53,7 @@ function dateFormat(date: Date) {
 }
 
 export const tourSpotHandlers = [
-  http.get('/tour-spots', async ({ request }) => {
+  http.get('/api/tour-spots', async ({ request }) => {
     const url = new URL(request.url);
 
     const query = url.searchParams.get('query');
@@ -120,7 +120,7 @@ export const tourSpotHandlers = [
     });
   }),
 
-  http.get('/tour-spots/map', async ({ request }) => {
+  http.get('/api/tour-spots/map', async ({ request }) => {
     const url = new URL(request.url);
 
     const query = url.searchParams.get('query');
@@ -175,7 +175,7 @@ export const tourSpotHandlers = [
     });
   }),
 
-  http.get('/tour-spots/:tourSpotId', async ({ params }) => {
+  http.get('/api/tour-spots/:tourSpotId', async ({ params }) => {
     const { tourSpotId } = params;
 
     let target = TEST_TOUR_SPOTS.find((tourSpot) => tourSpot.id == tourSpotId);
@@ -197,7 +197,7 @@ export const tourSpotHandlers = [
     return HttpResponse.json(target, { status: 200 });
   }),
 
-  http.get('/tour-spots/:tourSpotId/reviews', async ({ request, params }) => {
+  http.get('/api/tour-spots/:tourSpotId/reviews', async ({ request, params }) => {
     const url = new URL(request.url);
 
     const { tourSpotId } = params;
@@ -236,7 +236,7 @@ export const tourSpotHandlers = [
     });
   }),
 
-  http.post('/tour-spots/:tourSpotId/reviews', async ({ request, params }) => {
+  http.post('/api/tour-spots/:tourSpotId/reviews', async ({ request, params }) => {
     const { tourSpotId } = params;
 
     const reviewRequest = (await request.json()) as Pick<TourSpotReview, 'userId' | 'content'>;
@@ -285,7 +285,7 @@ export const tourSpotHandlers = [
     return HttpResponse.json(newReview, { status: 201 });
   }),
 
-  http.delete('/tour-spot-reviews/:tourSpotReviewId', async ({ params }) => {
+  http.delete('/api/tour-spot-reviews/:tourSpotReviewId', async ({ params }) => {
     const { tourSpotReviewId } = params;
 
     const target = TEST_TOUR_SPOT_REVIEWS.findIndex((review) => review.id == tourSpotReviewId);
@@ -325,7 +325,7 @@ export const tourSpotHandlers = [
     return new HttpResponse(null, { status: 204 });
   }),
 
-  http.put('/tour-spot-reviews/:tourSpotReviewId/likes', async ({ request, params }) => {
+  http.put('/api/tour-spot-reviews/:tourSpotReviewId/likes', async ({ request, params }) => {
     const likeRequest = (await request.json()) as Omit<TourSpotReviewLike, 'tourSpotId'>;
     const { tourSpotReviewId } = params;
 

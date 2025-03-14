@@ -27,7 +27,7 @@ export function useTourSpotRecommendations(
     setLoading(true);
 
     apiClient
-      .get<TourSpotRecommendation[] | UseDataError>(`/recommendations/${type}`)
+      .get<TourSpotRecommendation[] | UseDataError>(`/api/recommendations/${type}`)
       .then((response) => {
         setRecommendations(response.data as TourSpotRecommendation[]);
         setError(null);

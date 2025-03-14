@@ -30,7 +30,7 @@ interface PasswordPatch {
 }
 
 export const authHandlers = [
-  http.post('/auth/signup', async ({ request }) => {
+  http.post('/api/auth/signup', async ({ request }) => {
     const user = (await request.json()) as User;
 
     if (sessionStorage.getItem('user:' + user.id)) {
@@ -54,7 +54,7 @@ export const authHandlers = [
     );
   }),
 
-  http.post('/auth/login', async ({ request }) => {
+  http.post('/api/auth/login', async ({ request }) => {
     const credentials = (await request.json()) as UserCredentials;
     const u = sessionStorage.getItem('user:' + credentials.id);
     if (u && JSON.parse(u).id == credentials.id && JSON.parse(u).password == credentials.password) {
@@ -85,7 +85,7 @@ export const authHandlers = [
     );
   }),
 
-  http.post('/auth/logout', async ({ request, cookies }) => {
+  http.post('/api/auth/logout', async ({ request, cookies }) => {
     const userid = cookies.sessionid;
     if (sessionStorage.getItem('session:' + userid)) {
       sessionStorage.removeItem('session:' + userid);
@@ -101,7 +101,7 @@ export const authHandlers = [
     }
   }),
 
-  http.get('/auth/me', async ({ request, cookies }) => {
+  http.get('/api/auth/me', async ({ request, cookies }) => {
     const userid = cookies.sessionid;
     const u = sessionStorage.getItem('session:' + userid);
     if (u) {
@@ -134,7 +134,7 @@ export const authHandlers = [
     }
   }),
 
-  http.post('/auth/delete-account', async ({ request, cookies }) => {
+  http.post('/api/auth/delete-account', async ({ request, cookies }) => {
     const userid = cookies.sessionid;
     const u = sessionStorage.getItem('session:' + userid);
     if (u) {
@@ -152,7 +152,7 @@ export const authHandlers = [
     }
   }),
 
-  http.post('/auth/update-profile', async ({ request, cookies }) => {
+  http.post('/api/auth/update-profile', async ({ request, cookies }) => {
     const userid = cookies.sessionid;
     const userpatch = (await request.json()) as UserPatch;
     const u = sessionStorage.getItem('session:' + userid);
@@ -187,7 +187,7 @@ export const authHandlers = [
       );
     }
   }),
-  http.post('/auth/update-password', async ({ request, cookies }) => {
+  http.post('/api/auth/update-password', async ({ request, cookies }) => {
     const userid = cookies.sessionid;
     const passwordpatch = (await request.json()) as PasswordPatch;
     const u = sessionStorage.getItem('session:' + userid);

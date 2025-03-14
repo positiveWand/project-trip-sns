@@ -43,7 +43,7 @@ function tagView(tag: string) {
 }
 
 export const userHandlers = [
-  http.get('/users', async ({ request }) => {
+  http.get('/api/users', async ({ request }) => {
     const url = new URL(request.url);
 
     const query = url.searchParams.get('query') ? (url.searchParams.get('query') as string) : '';
@@ -69,7 +69,7 @@ export const userHandlers = [
     });
   }),
 
-  http.get('/users/:userId', async ({ params }) => {
+  http.get('/api/users/:userId', async ({ params }) => {
     const { userId } = params;
 
     const target = TEST_USERS.find((user) => user.id == userId);
@@ -87,7 +87,7 @@ export const userHandlers = [
     return HttpResponse.json(toProfile(target), { status: 200 });
   }),
 
-  http.get('/users/:userId/bookmarks', async ({ request, params }) => {
+  http.get('/api/users/:userId/bookmarks', async ({ request, params }) => {
     const url = new URL(request.url);
 
     const { userId } = params;
@@ -135,7 +135,7 @@ export const userHandlers = [
     });
   }),
 
-  http.post('/users/:userId/bookmarks', async ({ request }) => {
+  http.post('/api/users/:userId/bookmarks', async ({ request }) => {
     if (!AUTHORIZED) {
       return HttpResponse.json(
         {
@@ -171,7 +171,7 @@ export const userHandlers = [
     );
   }),
 
-  http.get('/users/:userId/bookmarks/:tourSpotId', async ({ params }) => {
+  http.get('/api/users/:userId/bookmarks/:tourSpotId', async ({ params }) => {
     const { userId, tourSpotId } = params;
 
     const targetBookmark = TEST_BOOKMARKS.findIndex(
@@ -197,7 +197,7 @@ export const userHandlers = [
     );
   }),
 
-  http.delete('/users/:userId/bookmarks/:tourSpotId', async ({ params }) => {
+  http.delete('/api/users/:userId/bookmarks/:tourSpotId', async ({ params }) => {
     if (!AUTHORIZED) {
       return HttpResponse.json(
         {
@@ -251,7 +251,7 @@ export const userHandlers = [
     return new HttpResponse(null, { status: 204 });
   }),
 
-  http.get('/users/:userId/tour-spot-reviews/likes', async ({ request, params }) => {
+  http.get('/api/users/:userId/tour-spot-reviews/likes', async ({ request, params }) => {
     const { userId } = params;
 
     const url = new URL(request.url);

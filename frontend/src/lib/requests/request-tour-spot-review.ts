@@ -45,7 +45,7 @@ export function requestPutTourSpotReviewLike(
 ) {
   return envelopeApiClient
     .put<Response<TourSpotReviewLike, RequestTourSpotError>>(
-      `/tour-spot-reviews/${tourSpotReviewId}/likes`,
+      `/api/tour-spot-reviews/${tourSpotReviewId}/likes`,
       {
         userId: userId,
         liked: liked,
@@ -60,7 +60,7 @@ export function requestPutTourSpotReviewLike(
 export function requestGetTourSpotReviewLikes(userId: string, tourSpotReviewIds: string[]) {
   return envelopeApiClient
     .get<Response<TourSpotReviewLike[], RequestTourSpotError>>(
-      `/users/${userId}/tour-spot-reviews/likes`,
+      `/api/users/${userId}/tour-spot-reviews/likes`,
       {
         params: {
           tourSpotReviewIds: tourSpotReviewIds,

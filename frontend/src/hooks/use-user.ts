@@ -24,7 +24,7 @@ export function useUsers(
     setLoading(true);
 
     paginationApiClient
-      .get<Page<UserProfile[]> | UseDataError>('/users', {
+      .get<Page<UserProfile[]> | UseDataError>('/api/users', {
         params: {
           query: query,
           pageNo: page,
@@ -65,7 +65,7 @@ export function useUser(
     }
 
     apiClient
-      .get<UserProfile | UseDataError>(`/users/${id}`)
+      .get<UserProfile | UseDataError>(`/api/users/${id}`)
       .then((response) => {
         setUser(response.data as UserProfile);
       })

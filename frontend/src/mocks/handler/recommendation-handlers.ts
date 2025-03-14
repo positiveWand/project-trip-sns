@@ -31,7 +31,7 @@ function tagView(tag: string) {
 }
 
 export const recommendationHandlers = [
-  http.get('/recommendations/:recommendationType', async ({ params }) => {
+  http.get('/api/recommendations/:recommendationType', async ({ params }) => {
     const { recommendationType } = params;
 
     if (recommendationType != 'main') {

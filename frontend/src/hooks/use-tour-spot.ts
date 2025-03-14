@@ -43,7 +43,7 @@ export function useTourSpots(
     setLoading(true);
 
     paginationApiClient
-      .get<Page<TourSpotOverview[]> | UseDataError>('/tour-spots', {
+      .get<Page<TourSpotOverview[]> | UseDataError>('/api/tour-spots', {
         params: {
           query: query,
           tags: tags,
@@ -83,7 +83,7 @@ export function useMapTourSpots(
     setLoading(true);
 
     apiClient
-      .get<TourSpotOverview[] | UseDataError>('/tour-spots/map', {
+      .get<TourSpotOverview[] | UseDataError>('/api/tour-spots/map', {
         params: {
           query: query,
           tags: tags,
@@ -128,7 +128,7 @@ export function useTourSpot(
     }
 
     apiClient
-      .get<TourSpot | Error>(`/tour-spots/${id}`)
+      .get<TourSpot | Error>(`/api/tour-spots/${id}`)
       .then((response) => {
         setTourSpot(response.data as TourSpot);
         setError(null);

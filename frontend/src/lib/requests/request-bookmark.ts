@@ -9,7 +9,7 @@ type RequestBookmarkError = never;
 
 export function requestPostUserBookmark(userId: string, tourSpotId: string) {
   return envelopeApiClient
-    .post<Response<Bookmark, RequestBookmarkError>>(`/users/${userId}/bookmarks`, {
+    .post<Response<Bookmark, RequestBookmarkError>>(`/api/users/${userId}/bookmarks`, {
       tourSpotId: tourSpotId,
     })
     .then((response) => {
@@ -20,7 +20,7 @@ export function requestPostUserBookmark(userId: string, tourSpotId: string) {
 
 export function requestDeleteUserBookmark(userId: string, tourSpotId: string) {
   return envelopeApiClient
-    .delete<Response<null, RequestBookmarkError>>(`/users/${userId}/bookmarks/${tourSpotId}`)
+    .delete<Response<null, RequestBookmarkError>>(`/api/users/${userId}/bookmarks/${tourSpotId}`)
     .then((response) => {
       return response.data;
     })
