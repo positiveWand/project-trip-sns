@@ -8,7 +8,7 @@ import Main from '@/components/layout/main';
 import UserSettings from './user-settings';
 import initApp from '@/init';
 
-initApp();
+await initApp();
 
 function MyPage() {
   return (

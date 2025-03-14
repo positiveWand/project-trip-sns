@@ -11,7 +11,7 @@ import { Welcome } from './welcome';
 import { useUserSession } from '@/hooks/use-user-session';
 import initApp from '@/init';
 
-initApp();
+await initApp();
 
 function MainPage() {
   const [sessionActive, userInfo] = useUserSession();

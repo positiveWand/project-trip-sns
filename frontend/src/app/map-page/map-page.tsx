@@ -10,7 +10,7 @@ import { Map } from './map';
 import initApp from '@/init';
 import { Toaster } from '@/components/ui/toaster';
 
-initApp();
+await initApp();
 
 function MapPage() {
   return (
