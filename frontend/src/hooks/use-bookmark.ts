@@ -9,6 +9,16 @@ export interface UseDataError {
 export interface Bookmark {
   userId: string;
   tourSpotId: string;
+  tourSpotOverview: {
+    name: string;
+    address: string;
+    lat: number;
+    lng: number;
+    imageUrl: string;
+    description: string;
+    phoneNumber: string;
+    tags: string[];
+  };
 }
 
 export function useUserBookmarks(
@@ -31,7 +41,12 @@ export function useUserBookmarks(
     }
 
     paginationApiClient
-      .get<Page<Bookmark[]> | UseDataError>(`/users/${userId}`)
+      .get<Page<Bookmark[]> | UseDataError>(`/users/${userId}/bookmarks`, {
+        params: {
+          pageNo: page,
+          pageSize: limit,
+        },
+      })
       .then((response) => {
         setBookmarks(response.data as Page<Bookmark[]>);
         setError(null);
