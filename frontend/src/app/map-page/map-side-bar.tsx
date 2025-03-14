@@ -17,6 +17,7 @@ import { useAllUrlSearchParam, useUrlPathParam, useUrlSearchParam } from '@/hook
 import { Badge } from '@/components/ui/badge';
 import { Pagination } from '@/components/ui/pagination';
 import { useTourSpots } from '@/hooks/use-tour-spot';
+import { MAP_PAGE } from '@/config';
 
 const CATEGORY_FILTER = [
   { name: '자연', value: 'nature' },
@@ -43,7 +44,7 @@ export function MapSideBar({ className }: MapSidebarProps) {
   const [tags, setTags] = useAllUrlSearchParam('tags');
   const [customFilters, setCustomFilters] = useAllUrlSearchParam('customFilters');
   const [sort, setSort] = useUrlSearchParam('sort', undefined);
-  const [, setFocusedTourSpotId] = useUrlPathParam('/tourSpot/:focusedTourSpotId');
+  const [, setFocusedTourSpotId] = useUrlPathParam(MAP_PAGE + '/tourSpot/:focusedTourSpotId');
   const [page, setPage] = useState<number>(1);
 
   const [tourSpots, error, loading] = useTourSpots(
