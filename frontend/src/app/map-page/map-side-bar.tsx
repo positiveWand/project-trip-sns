@@ -20,15 +20,15 @@ import { useTourSpots } from '@/hooks/use-tour-spot';
 import { MAP_PAGE } from '@/config';
 
 const CATEGORY_FILTER = [
-  { name: '자연', value: 'nature' },
-  { name: '역사', value: 'history' },
-  { name: '휴양', value: 'rest' },
-  { name: '체험', value: 'experience' },
-  { name: '산업', value: 'industry' },
-  { name: '건축/조형', value: 'architecture' },
-  { name: '문화', value: 'culture' },
-  { name: '축제', value: 'festival' },
-  { name: '공연/행사', value: 'event' },
+  { name: '자연', value: 'NATURE' },
+  { name: '역사', value: 'HISTORY' },
+  { name: '휴양', value: 'REST' },
+  { name: '체험', value: 'EXPERIENCE' },
+  { name: '산업', value: 'INDUSTRY' },
+  { name: '건축/조형', value: 'ARCHITECTURE' },
+  { name: '문화', value: 'CULTURE' },
+  { name: '축제', value: 'FESTIVAL' },
+  { name: '공연/행사', value: 'CONCERT' },
 ];
 const USER_FILTER = [{ name: '북마크', value: 'bookmark' }];
 const SORT_OPTION = [
