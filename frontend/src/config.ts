@@ -1,9 +1,9 @@
 const MAIN_PAGE = '/';
-const MAP_PAGE = '/map/';
-const SOCIAL_PAGE = '/social/';
-const LOGIN_PAGE = '/login/';
-const SIGNUP_PAGE = '/signup/';
-const MY_PAGE = '/my/';
+const MAP_PAGE = '/map';
+const SOCIAL_PAGE = '/social';
+const LOGIN_PAGE = '/login';
+const SIGNUP_PAGE = '/signup';
+const MY_PAGE = '/my';
 
 const NAME_PATTERN = '^[가-힣]{2,6}|[a-zA-Z\s]{2,24}$';
 const ID_PATTERN = '^[a-zA-Z][a-zA-Z0-9]{7,16}$';

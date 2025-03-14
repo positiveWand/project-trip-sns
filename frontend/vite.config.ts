@@ -11,10 +11,16 @@ export default defineConfig({
       name: 'configure-server',
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
-          if (req.url?.startsWith('/map/')) {
+          if (req.url?.startsWith('/map')) {
             req.url = '/map/index.html';
-          } else if(req.url?.startsWith('/social/')) {
+          } else if(req.url?.startsWith('/social')) {
             req.url = '/social/index.html';
+          } else if(req.url?.startsWith('/login')) {
+            req.url = '/login/index.html';
+          } else if(req.url?.startsWith('/signup')) {
+            req.url = '/signup/index.html';
+          } else if(req.url?.startsWith('/my')) {
+            req.url = '/my/index.html';
           }
           next();
         })
