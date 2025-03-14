@@ -39,7 +39,7 @@ public class TourSpotController {
             @RequestParam(name = "query", defaultValue = "") String query,
             @RequestParam(name = "tags", defaultValue = "") List<String> tags,
             @RequestParam(name = "customFilters", defaultValue = "") List<String> customFilters,
-            @RequestParam(name = "sort", required = false) String sort,
+            @RequestParam(name = "sort", defaultValue = "name-asc") String sort,
             @RequestParam(name = "pageNo", defaultValue = "1") int pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") int pageSize
     ) {
@@ -56,7 +56,7 @@ public class TourSpotController {
                 query,
                 tags,
                 sortCriteria,
-                pageNo,
+                pageNo-1,
                 pageSize
         );
 
@@ -66,7 +66,7 @@ public class TourSpotController {
     @GetMapping("/tour-spots/map")
     @PaginationHeader
     public List<TourSpotOverviewResponse> getTourSpotsInMap(
-            @RequestParam(name = "query", required = false) String query,
+            @RequestParam(name = "query", defaultValue = "") String query,
             @RequestParam(name = "tags", defaultValue = "") List<String> tags,
             @RequestParam(name = "customFilters", defaultValue = "") List<String> customFilters,
             @RequestParam(name = "minLat") Double minLat,

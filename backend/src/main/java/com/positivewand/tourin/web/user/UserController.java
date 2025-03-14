@@ -41,9 +41,9 @@ public class UserController {
         Page<UserDto> userDtoPage = null;
 
         if(query == null) {
-            userDtoPage = userService.findUsers(pageNo, pageSize);
+            userDtoPage = userService.findUsers(pageNo-1, pageSize);
         } else {
-            userDtoPage = userService.findUsers(query, pageNo, pageSize);
+            userDtoPage = userService.findUsers(query, pageNo-1, pageSize);
         }
 
         return userDtoPage.map((UserDto userDto) -> new UserResponse(userDto.username(), userDto.name()));
@@ -63,7 +63,7 @@ public class UserController {
             @RequestParam(name = "pageNo", defaultValue = "1") int pageNo,
             @RequestParam(name = "pageSize", defaultValue = "10") int pageSize
     ) {
-        Page<BookmarkDto> bookmarks = bookmarkService.findBookmarks(userId, pageNo, pageSize);
+        Page<BookmarkDto> bookmarks = bookmarkService.findBookmarks(userId, pageNo-1, pageSize);
 
         return bookmarks.map(BookmarkResponse::createFromDto);
     }
