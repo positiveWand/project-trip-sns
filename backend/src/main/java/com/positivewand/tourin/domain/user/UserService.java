@@ -1,5 +1,7 @@
 package com.positivewand.tourin.domain.user;
 
+import com.positivewand.tourin.domain.tourspot.TourSpotReviewLikeRepository;
+import com.positivewand.tourin.domain.tourspot.TourSpotReviewRepository;
 import com.positivewand.tourin.domain.user.dto.UserDto;
 import com.positivewand.tourin.domain.user.entity.User;
 import com.positivewand.tourin.domain.user.exception.DuplicateUserException;
@@ -17,6 +19,9 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final BookmarkRepository bookmarkRepository;
+    private final TourSpotReviewRepository tourSpotReviewRepository;
+    private final TourSpotReviewLikeRepository tourSpotReviewLikeRepository;
 
     public UserDto findUser(String username) {
         Optional<User> user = userRepository.findByUsername(username);
@@ -78,6 +83,22 @@ public class UserService {
 
     @Transactional
     public void deleteUser(String username) {
-        userRepository.deleteByUsername(username);
+        Optional<User> user = userRepository.findByUsername(username);
+
+        if(user.isEmpty()) {
+            throw new NoSuchUserException("등록된 회원이 없습니다.");
+        }
+
+        // 회원의 관광지 후기 좋아요 삭제
+        tourSpotReviewLikeRepository.deleteByUserId(user.get().getId());
+        
+        // 회원의 관광지 후기 삭제
+        tourSpotReviewRepository.deleteByUser_Id(user.get().getId());
+
+        // 회원의 북마크 삭제
+        bookmarkRepository.deleteByUserId(user.get().getId());
+
+        // 회원 삭제
+        userRepository.delete(user.get());
     }
 }

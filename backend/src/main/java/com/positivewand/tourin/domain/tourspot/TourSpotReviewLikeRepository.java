@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface TourSpotReviewLikeRepository extends JpaRepository<TourSpotReviewLike, TourSpotReviewLikeId> {
+    void deleteByUserId(Long userId);
 }

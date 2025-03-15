@@ -9,5 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TourSpotReviewRepository extends JpaRepository<TourSpotReview, Long> {
     Page<TourSpotReview> findByTourSpotId(Long tourSpotId, Pageable pageable);
 
+    void deleteByUser_Id(Long userId);
+
     Long countById(Long id);
 }
