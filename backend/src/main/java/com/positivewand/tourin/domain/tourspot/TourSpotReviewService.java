@@ -22,6 +22,7 @@ public class TourSpotReviewService {
     private final TourSpotRepository tourSpotRepository;
     private final UserRepository userRepository;
     private final TourSpotReviewRepository tourSpotReviewRepository;
+    private final TourSpotReviewLikeRepository tourSpotReviewLikeRepository;
 
     public Page<TourSpotReviewDto> findTourSpotReviews(Long tourSpotId, int page, int size) {
         Optional<TourSpot> tourSpot = tourSpotRepository.findById(tourSpotId);
@@ -40,7 +41,7 @@ public class TourSpotReviewService {
                 entity.getTourSpot().getId(),
                 entity.getUser().getUsername(),
                 entity.getContent(),
-                tourSpotReviewRepository.countById(entity.getId())
+                tourSpotReviewLikeRepository.countByTourSpotReview(entity)
         ));
     }
 
