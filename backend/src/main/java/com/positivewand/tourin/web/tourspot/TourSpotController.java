@@ -74,6 +74,10 @@ public class TourSpotController {
             @RequestParam(name = "maxLat") Double maxLat,
             @RequestParam(name = "maxLng") Double maxLng
     ) {
+        if (Haversine.calculateDistance(minLat, minLng, maxLat, maxLng) > 30) {
+            throw new IllegalArgumentException("대각선 길이가 30km 이하인 경우에만 지도에서 검색이 가능합니다.");
+        }
+
         List<TourSpotDto> tourSpots = tourSpotService.findTourSpots(
                 query,
                 tags,
