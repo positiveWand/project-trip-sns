@@ -4,8 +4,6 @@ import com.positivewand.tourin.domain.tourspot.TourSpotReviewLikeRepository;
 import com.positivewand.tourin.domain.tourspot.TourSpotReviewRepository;
 import com.positivewand.tourin.domain.user.dto.UserDto;
 import com.positivewand.tourin.domain.user.entity.User;
-import com.positivewand.tourin.domain.user.exception.DuplicateUserException;
-import com.positivewand.tourin.domain.user.exception.NoSuchUserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +25,7 @@ public class UserService {
         Optional<User> user = userRepository.findByUsername(username);
 
         if(user.isEmpty()) {
-            throw new NoSuchUserException("등록된 회원이 없습니다.");
+            throw new NoSuchElementException("등록된 회원이 없습니다.");
         }
 
         return UserDto.createFromUser(user.get());
@@ -50,7 +48,7 @@ public class UserService {
         Optional<User> duplicateUser = userRepository.findByUsername(username);
 
         if(duplicateUser.isPresent()) {
-            throw new DuplicateUserException("이미 가입된 회원이 있습니다.");
+            throw new IllegalStateException("이미 가입된 회원이 있습니다.");
         }
 
         User user = User.createUser(username, password, name, email);
@@ -62,7 +60,7 @@ public class UserService {
         Optional<User> user = userRepository.findByUsername(username);
 
         if(user.isEmpty()) {
-            throw new NoSuchUserException("등록된 회원이 없습니다.");
+            throw new NoSuchElementException("등록된 회원이 없습니다.");
         }
 
         user.get().updateProfile(name, email);
@@ -74,7 +72,7 @@ public class UserService {
         Optional<User> user = userRepository.findByUsername(username);
 
         if(user.isEmpty()) {
-            throw new NoSuchUserException("등록된 회원이 없습니다.");
+            throw new NoSuchElementException("등록된 회원이 없습니다.");
         }
 
         user.get().changePassword(newPassword);
@@ -86,7 +84,7 @@ public class UserService {
         Optional<User> user = userRepository.findByUsername(username);
 
         if(user.isEmpty()) {
-            throw new NoSuchUserException("등록된 회원이 없습니다.");
+            throw new NoSuchElementException("등록된 회원이 없습니다.");
         }
 
         // 회원의 관광지 후기 좋아요 삭제

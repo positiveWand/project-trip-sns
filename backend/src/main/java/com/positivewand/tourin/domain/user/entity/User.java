@@ -32,13 +32,6 @@ public class User {
         return user;
     }
 
-
-    public static class InvalidUserEntity extends RuntimeException {
-        public InvalidUserEntity(String message) {
-            super(message);
-        }
-    }
-
     private void setUsername(String username) {
         this.username = username;
     }
@@ -50,7 +43,7 @@ public class User {
     }
     private void setEmail(String email) {
         if (!Pattern.matches("^(?!\\.)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", email)) {
-            throw new InvalidUserEntity("이메일 형식이 올바르지 않습니다.");
+            throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
         }
 
         this.email = email;
