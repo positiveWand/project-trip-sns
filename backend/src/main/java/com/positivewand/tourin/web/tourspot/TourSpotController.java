@@ -64,7 +64,6 @@ public class TourSpotController {
     }
 
     @GetMapping("/tour-spots/map")
-    @PaginationHeader
     public List<TourSpotOverviewResponse> getTourSpotsInMap(
             @RequestParam(name = "query", defaultValue = "") String query,
             @RequestParam(name = "tags", defaultValue = "") List<String> tags,
@@ -88,7 +87,6 @@ public class TourSpotController {
     }
 
     @GetMapping("/tour-spots/{tourSpotId}")
-    @PaginationHeader
     public TourSpotResponse getTourSpot(@PathVariable(name = "tourSpotId") Long tourSpotId) {
         TourSpotDto tourSpot = tourSpotService.findTourSpot(tourSpotId);
 
@@ -96,7 +94,6 @@ public class TourSpotController {
     }
 
     @GetMapping("/tour-spots/{tourSpotId}/reviews")
-    @PaginationHeader
     public Page<TourSpotReviewResponse> getTourSpotReviews(
             @PathVariable(name = "tourSpotId") Long tourSpotId,
             @RequestParam(name = "pageNo", defaultValue = "1") int pageNo,
@@ -108,6 +105,7 @@ public class TourSpotController {
     }
 
     @PostMapping("/tour-spots/{tourSpotId}/reviews")
+    @ResponseStatus(HttpStatus.CREATED)
     public TourSpotReviewResponse addTourSpotReview(
             @PathVariable(name = "tourSpotId") Long tourSpotId,
             @RequestBody AddTourSpotReviewRequest request
