@@ -32,7 +32,12 @@ export function Map({ className }: MapProps) {
     MAP_PAGE + '/tourSpot/:focusedTourSpotId',
   );
 
-  const [latLngBound, setLatLngBound] = useState<LatLngBound>();
+  const [latLngBound, setLatLngBound] = useState<LatLngBound>({
+    minLat: 33.19057311592686,
+    minLng: 125.64731532512754,
+    maxLat: 38.66330763609968,
+    maxLng: 128.96250600490296,
+  });
 
   const [tourSpots, tourSpotError] = useMapTourSpots(query, tags, customFilters, latLngBound);
   const [focusedTourSpot] = useTourSpot(focusedTourSpotId);
