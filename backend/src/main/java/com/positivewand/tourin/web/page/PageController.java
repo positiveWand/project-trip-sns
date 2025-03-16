@@ -17,6 +17,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 public class PageController {
+    @GetMapping({"/my"})
+    public ResponseEntity<Resource> serveMyPage() {
+        Resource resource = new ClassPathResource("static/my/index.html");
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(resource);
+    }
     @GetMapping({"/login"})
     public ResponseEntity<Resource> serveLoginPage() {
         Resource resource = new ClassPathResource("static/login/index.html");
