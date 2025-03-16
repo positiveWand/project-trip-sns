@@ -2,6 +2,7 @@ package com.positivewand.tourin.domain.tourspot.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
@@ -34,5 +35,6 @@ public class TourSpot {
     private Double lng;
 
     @OneToMany(mappedBy = "tourSpot")
+    @BatchSize(size = 50)
     private List<TourSpotTag> tags;
 }

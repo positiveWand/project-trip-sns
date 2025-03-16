@@ -1,5 +1,6 @@
 package com.positivewand.tourin.domain.tourspot;
 
+import com.positivewand.tourin.domain.common.Ngram;
 import com.positivewand.tourin.domain.tourspot.dto.TourSpotDto;
 import com.positivewand.tourin.domain.tourspot.entity.TourSpot;
 import com.positivewand.tourin.domain.tourspot.entity.TourSpotCategory;
@@ -35,6 +36,9 @@ public class TourSpotService {
             int page,
             int size
     ) {
+        query = query.replaceAll(" ", "");
+        query = String.join(" ", Ngram.parseNgrams(2, query));
+
         Page<TourSpot> tourSpots = null;
         if (tags.isEmpty()) {
             tourSpots = tourSpotRepository.findByNameContaining(query, PageRequest.of(page, size, sort));
@@ -52,6 +56,9 @@ public class TourSpotService {
             List<String> tags,
             LatLngBounds latLngBounds
     ) {
+        query = query.replaceAll(" ", "");
+        query = String.join(" ", Ngram.parseNgrams(2, query));
+
         List<TourSpot> tourSpots = null;
         if (tags.isEmpty()) {
             tourSpots = tourSpotRepository.findByNameAndLatLngBounds(
