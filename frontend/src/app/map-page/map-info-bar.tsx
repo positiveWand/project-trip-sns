@@ -48,7 +48,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { SOCIAL_PAGE } from '@/config';
+import { MAP_PAGE, SOCIAL_PAGE } from '@/config';
 import { useIsBookmark } from '@/hooks/use-bookmark';
 import { IDENTITY_TRANSFORM, useProxyState } from '@/hooks/use-proxy-state';
 
@@ -159,7 +159,7 @@ export function MapInfoBar({ open, onOpenChange, info, className }: MapInfoBarPr
   };
   const shareButtonHandler = async () => {
     navigator.clipboard
-      .writeText(window.location.host + '/tourSpot/' + info.id)
+      .writeText(window.location.host + MAP_PAGE + '/tourSpot/' + info.id)
       .then(() => {
         toast({
           title: '관광지 공유',
@@ -275,7 +275,7 @@ export function MapInfoBar({ open, onOpenChange, info, className }: MapInfoBarPr
                       <DialogTitle>후기</DialogTitle>
                       <DialogDescription>관광지는 어떠셨나요? 후기를 남겨주세요!</DialogDescription>
                     </DialogHeader>
-                    <Textarea maxLength={10} ref={reviewTextRef} />
+                    <Textarea maxLength={100} ref={reviewTextRef} />
                     <DialogFooter>
                       <Button type='submit' onClick={postReviewButtonHandler}>
                         작성

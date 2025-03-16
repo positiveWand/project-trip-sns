@@ -19,7 +19,7 @@ export type RequestTourSpotError = never;
 
 export function requestPostTourSpotReview(tourSpotId: string, userId: string, content: string) {
   return envelopeApiClient
-    .post<Response<TourSpotReview, RequestTourSpotError>>(`/tour-spots/${tourSpotId}/reviews`, {
+    .post<Response<TourSpotReview, RequestTourSpotError>>(`/api/tour-spots/${tourSpotId}/reviews`, {
       userId: userId,
       content: content,
     })
@@ -31,7 +31,7 @@ export function requestPostTourSpotReview(tourSpotId: string, userId: string, co
 
 export function requestDeleteTourSpotReview(tourSpotReviewId: string) {
   return envelopeApiClient
-    .delete<Response<null, RequestTourSpotError>>(`/tour-spot-reviews/${tourSpotReviewId}`)
+    .delete<Response<null, RequestTourSpotError>>(`/api/tour-spot-reviews/${tourSpotReviewId}`)
     .then((response) => {
       return response.data;
     })
