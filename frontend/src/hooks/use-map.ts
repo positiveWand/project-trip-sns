@@ -75,7 +75,7 @@ function dispatchFocusedMarker(action: FocusedMarkerAction) {
   switch (action.type) {
     case 'SET_FOCUSED_MARKER':
       if (!MAP_STATE.map) {
-        throw Error('네이버 지도 객체가 없습니다.');
+        throw Error('지도 객체가 없습니다.');
       }
 
       if (MAP_STATE.markers[action.markerId]) {
@@ -132,7 +132,7 @@ function dispatchMarkers(action: MarkersAction) {
   switch (action.type) {
     case 'SET_MARKERS':
       if (!MAP_STATE.map) {
-        throw Error('네이버 지도 객체가 없습니다.');
+        throw Error('지도 객체가 없습니다.');
       }
 
       const newMarkers: typeof MAP_STATE.markers = {};
