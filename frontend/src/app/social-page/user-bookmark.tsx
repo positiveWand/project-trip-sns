@@ -24,7 +24,7 @@ export function UserBookmark({ className, userId }: UserBookmarkProps) {
               address={bookmark.tourSpotOverview.address}
               imageUrl={bookmark.tourSpotOverview.imageUrl}
               tags={bookmark.tourSpotOverview.tags}
-              href={MAP_PAGE + `tourSpot/${bookmark.tourSpotId}`}
+              href={MAP_PAGE + `/tourSpot/${bookmark.tourSpotId}`}
             />
           );
         })

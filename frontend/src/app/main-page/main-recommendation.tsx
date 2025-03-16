@@ -28,7 +28,7 @@ export function MainRecommendation({ className }: MainRecommendationProps) {
             address={tourSpot.address}
             imageUrl={tourSpot.imageUrl}
             tags={tourSpot.tags}
-            href={MAP_PAGE + `tourSpot/${tourSpot.id}`}
+            href={MAP_PAGE + `/tourSpot/${tourSpot.id}`}
           />
         );
       })}
