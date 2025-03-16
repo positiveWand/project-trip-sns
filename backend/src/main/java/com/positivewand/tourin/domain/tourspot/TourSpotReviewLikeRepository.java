@@ -9,5 +9,6 @@ import java.util.Optional;
 
 public interface TourSpotReviewLikeRepository extends JpaRepository<TourSpotReviewLike, TourSpotReviewLikeId> {
     void deleteByUserId(Long userId);
+    void deleteByTourSpotReviewId(Long tourSpotReviewId);
     Long countByTourSpotReview(TourSpotReview tourSpotReview);
 }

@@ -68,6 +68,13 @@ public class TourSpotReviewService {
 
     @Transactional
     public void deleteTourSpotReview(Long tourSpotReviewId) {
+        Optional<TourSpotReview> tourSpotReview = tourSpotReviewRepository.findById(tourSpotReviewId);
+
+        if(tourSpotReview.isEmpty()) {
+            throw new NoSuchElementException("관광지 후기가 존재하지 않습니다.");
+        }
+
+        tourSpotReviewLikeRepository.deleteByTourSpotReviewId(tourSpotReviewId);
         tourSpotReviewRepository.deleteById(tourSpotReviewId);
     }
 }
