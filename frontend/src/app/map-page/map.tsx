@@ -10,11 +10,12 @@ import {
 } from '@/hooks/use-url';
 import { LatLngBound, useMapTourSpots, useTourSpot, useTourSpots } from '@/hooks/use-tour-spot';
 import { MAP_PAGE } from '@/config';
+import { useToast } from '@/hooks/use-toast';
 
 // 지도 config
 const INIT_CENTER = new naver.maps.LatLng(33.37521429272602, 126.53454937152777);
 const INIT_ZOOM = 10;
-const FOCUS_ZOOM = 12;
+const FOCUS_ZOOM = 14;
 
 export interface MapProps extends ComponentProps<'div'> {}
 
@@ -33,10 +34,21 @@ export function Map({ className }: MapProps) {
 
   const [latLngBound, setLatLngBound] = useState<LatLngBound>();
 
-  const [tourSpots] = useMapTourSpots(query, tags, customFilters, latLngBound);
+  const [tourSpots, tourSpotError] = useMapTourSpots(query, tags, customFilters, latLngBound);
   const [focusedTourSpot] = useTourSpot(focusedTourSpotId);
 
   const changeUrl = useChangeUrl(MAP_PAGE, true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!tourSpotError) return;
+
+    toast({
+      title: tourSpotError.error,
+      description: tourSpotError.message,
+      variant: 'destructive',
+    });
+  }, [tourSpotError]);
 
   useEffect(() => {
     if (!mapContainer.current) return;
