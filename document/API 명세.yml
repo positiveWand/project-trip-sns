@@ -1,0 +1,1271 @@
+openapi: 3.0.3
+info:
+  title: project-trip-sns API
+  version: "0.0.0"
+  description: |
+    관광지를 탐색하고 추천받을 수 있는 TOURIN을 위한 API입니다.
+servers:
+  - url: "https://www.projecttripsns.com/api/v1"
+
+tags:
+  - name: auth
+    description: 회원관리, 인증, 인가 관련 API
+  - name: 회원
+    description: 회원 API
+  - name: 관광지
+    description: 관광지 API
+  - name: 추천
+    description: 추천 관련 API
+    
+
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - auth
+      summary: 회원가입 요청
+      description: 전달된 회원 정보로 회원가입을 요청합니다. 회원가입된 사용자는 사용자 세션을 생성하고 부가적인 서비스에 접근할 수 있게 됩니다.
+      requestBody:
+        description: 회원가입에 필요한 회원정보.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: 회원가입 성공입니다. 제출한 아이디와 비밀번호로 로그인이 가능합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: 회원가입 실패입니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "422":
+          description: 회원가입 실패입니다. 회원정보가 유효하지 않은 형식이거나 중복된 회원이 이미 가입되어 있습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: 로그인 요청
+      description: 인증 크리덴셜을 이용해 사용자 세션을 생성합니다.
+      requestBody:
+        description: 세션 생성을 위해 필요한 사용자 인증 크리덴셜입니다. 회원가입 시 등록한 아이디, 비밀번호를 사용해야합니다.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCredentials"
+      responses:
+        "200":
+          description: 로그인 성공입니다. 사용자 세션이 생성되었습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: 로그인 실패입니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 로그인 실패입니다. 아이디 또는 비밀번호가 회원정보와 일치하지 않는 경우의 응답입니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "422":
+          description: 로그인 실패입니다. 아이디/비밀번호가 요구 형식을 만족하지 않는 경우의 응답입니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/logout:
+    post:
+      tags:
+        - auth
+      summary: 로그아웃 요청
+      description: 로그인 요청으로 생성된 사용자 세션을 종료합니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "204":
+          description: 로그아웃 성공입니다. 사용자 세션이 종료되었습니다.
+        "400":
+          description: 로그아웃 실패입니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 로그아웃 실패입니다. 애초에 로그인이 되어있지 않거나, 세션이 만료되었을 가능성이 높습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/me:
+    get:
+      tags:
+        - auth
+      summary: 세션 정보 조회
+      description: 세션 ID를 이용해 사용자 세션에 대한 정보를 조회합니다. 요청 시에는 쿠키 헤더에 세션 ID가 반드시 포함되어 있어야합니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "200":
+          description: 세션 조회 성공입니다. 세션 사용자에 대한 정보가 반환됩니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: 로그아웃 실패입니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 세션 조회 실패입니다. 애초에 로그인이 되어있지 않거나, 세션이 만료되었을 가능성이 높습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/delete-account:
+    post:
+      tags:
+        - auth
+      summary: 회원탈퇴
+      description: 사이트에서 회원이 탈퇴합니다. 회원 소유의 데이터는 모두 삭제됩니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "204":
+          description: 회원탈퇴 성공입니다. 회원 계정과 회원 소유의 데이터는 모두 삭제됐습니다.
+        "400":
+          description: 회원탈퇴 실패입니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 회원탈퇴 실패입니다. 탈퇴를 하기 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/update-profile:
+    post:
+      tags:
+        - auth
+      summary: 회원정보 변경
+      description: 회원정보를 변경합니다.
+      security:
+        - CookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserPatch"
+      responses:
+        "200":
+          description: 회원정보 변경 성공입니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: 회원정보 변경 실패입니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 회원정보 변경 실패입니다. 변경하기 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "422":
+          description: 회원정보 변경 실패입니다. 회원정보가 유효하지 않은 형식입니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/update-password:
+    post:
+      tags:
+        - auth
+      summary: 회원계정 비밀번호 변경
+      description: 회원계정 비밀번호를 변경합니다.
+      security:
+        - CookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordPatch"
+      responses:
+        "204":
+          description: 회원계정 비밀번호 변경 성공입니다.
+        "400":
+          description: 회원계정 비밀번호 변경 실패입니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 회원계정 비밀번호 변경 실패입니다. 사용자가 인증되어 있지 않거나 기존 비밀번호(oldPassword)가 회원정보와 일치하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "422":
+          description: 회원계정 비밀번호 변경 실패입니다. 비밀번호가 요구 형식을 만족하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /users:
+    parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        description: 회원 ID 검색 문자열
+      - in: query
+        name: pageNo
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+        description: 페이지 번호
+      - in: query
+        name: pageSize
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 100
+        description: 페이지 크기
+    get:
+      tags:
+        - 회원
+      summary: 검색 조건에 부합하는 회원 모음 조회
+      description: 검색 조건(query)에 부합하는 회원들을 조회합니다.
+      responses:
+        "200":
+          description: 회원 모음 조회에 성공했습니다.
+          headers:
+            X-Pagination-Page:
+              description: 현재 페이지 번호
+              schema:
+                type: integer
+            X-Pagination-Page-Size:
+              description: 현재 페이지 크기
+              schema:
+                type: integer
+            X-Pagination-Page-Limit:
+              description: 페이지 최대 크기
+              schema:
+                type: integer
+            X-Pagination-Total-Page:
+              description: 총 페이지 개수
+              schema:
+                type: integer
+            X-Pagination-Total-Item:
+              description: 총 아이템 개수
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserProfile"
+        "400":
+          description: 회원 모음 조회에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 회원 모음 조회에 실패했습니다. 조회를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: 회원 모음 조회에 실패했습니다. 페이지 파라미터(pageNo, pageSize)가 적절하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /users/{userId}:
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+        description: 회원 ID
+    get:
+      tags:
+        - 회원
+      summary: 회원 프로필 조회
+      description: 회원의 프로필을 조회합니다.
+      responses:
+        "200":
+          description: 회원 프로필 조회에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "400":
+          description: 회원 프로필 조회에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 회원 프로필 조회에 실패했습니다. 조회를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: 회원 프로필 조회에 실패했습니다. 회원 ID(userId)에 해당하는 회원이 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /users/{userId}/bookmarks:
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+        description: 사용자 회원 ID
+    get:
+      tags:
+        - 회원
+      summary: 회원의 "북마크" 조회
+      description: 회원(userId)이 "북마크"에 추가한 관광지 모음을 조회합니다.
+      parameters:
+        - in: query
+          name: pageNo
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: 페이지 번호
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          description: 페이지 크기
+      responses:
+        "200":
+          description: 북마크 조회에 성공했습니다.
+          headers:
+            X-Pagination-Page:
+              description: 현재 페이지 번호
+              schema:
+                type: integer
+            X-Pagination-Page-Size:
+              description: 현재 페이지 크기
+              schema:
+                type: integer
+            X-Pagination-Page-Limit:
+              description: 페이지 최대 크기
+              schema:
+                type: integer
+            X-Pagination-Total-Page:
+              description: 총 페이지 개수
+              schema:
+                type: integer
+            X-Pagination-Total-Item:
+              description: 총 아이템 개수
+              schema:
+                type: integer 
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bookmark"
+        "400":
+          description: 북마크 조회에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 북마크 조회에 실패했습니다. 조회를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: 북마크 조회에 실패했습니다. 페이지 파라미터(pageNo, pageSize)가 적절하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - 회원
+      summary: 회원의 "북마크"에 관광지 추가
+      description: 회원(userId)의 "북마크"에 관광지를 추가합니다.
+      security:
+        - CookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Bookmark"
+      responses:
+        "201":
+          description: 북마크 추가에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bookmark"
+        "400":
+          description: 북마크 추가에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 북마크 추가에 실패했습니다. 추가를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: 북마크 추가에 실패했습니다. 회원은 자신의 북마크에만 관광지를 추가할 수 있습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: 북마크 추가에 실패했습니다. 회원이 존재하지 않거나, 북마크에 추가하려는 관광지가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /users/{userId}/bookmarks/{tourSpotId}:
+    parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: string
+        description: 회원 ID
+      - in: path
+        name: tourSpotId
+        required: true
+        schema:
+          type: string
+        description: 삭제하려는 관광지 ID
+    get:
+      tags:
+        - 회원
+      summary: 회원의 "북마크"에서 특정 관광지를 조회
+      description: 회원(userId)의 "북마크"에서 관광지(tourSpotId)를 조회합니다.
+      responses:
+        "200":
+          description: 북마크 조회에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bookmark'
+        "400":
+          description: 북마크 조회에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 북마크 조회에 실패했습니다. 회원이 존재하지 않거나, 북마크에 관광지가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - 회원
+      summary: 회원의 "북마크"에서 특정 관광지를 삭제
+      description: 회원(userId)의 "북마크"에서 관광지(tourSpotId)를 삭제합니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "204":
+          description: 북마크 삭제에 성공했습니다.
+        "400":
+          description: 북마크 삭제에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 북마크 삭제에 실패했습니다. 삭제를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: 북마크 삭제에 실패했습니다. 회원은 자신의 북마크에서만 관광지를 삭제할 수 있습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: 북마크 삭제에 실패했습니다. 회원이 존재하지 않거나, 북마크에 관광지가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /users/{userId}/tour-spot-reviews/likes:
+    get:
+      tags:
+        - 회원
+      summary: 회원과 관광지 후기의 공감 관계를 조회
+      description: 회원(userId)과 관광지 후기들(tourSpotIds) 간의 공감 관계(공감 여부)를 조회합니다.
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: 사용자 회원 ID
+        - in: query
+          name: tourSpotReviewIds
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: 관광지 후기 ID
+      responses:
+        "200":
+          description: 관광지 후기 공감 여부 모음 조회에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TourSpotReviewLike"
+        "400":
+          description: 관광지 후기 공감 여부 모음 조회에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 관광지 후기 공감 여부 모음 조회에 실패했습니다. 회원(userId)이 존재하지 않거나, 관광지 후기 ID(tourSpotReviewIds)에 해당하는 후기가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /tour-spots:
+    parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        description: 검색 키워드
+      - in: query
+        name: tags
+        schema:
+          type: array
+          items:
+            type: string
+        description: 관광지 태그 모음
+      - in: query
+        name: customFilters
+        schema:
+          type: array
+          items:
+            type: string
+        description: 사용자 맞춤 필터
+      - in: query
+        name: sort
+        schema:
+          type: string
+          enum:
+            - name-asc
+            - name-desc
+          default: name-asc
+        description: 관광지 모음 정렬 종류
+      - in: query
+        name: pageNo
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+        description: 페이지 번호
+      - in: query
+        name: pageSize
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 100
+        description: 페이지 크기
+        
+    get:
+      tags:
+        - 관광지
+      summary: 검색 조건에 부합하는 관광지 모음 조회
+      description: 검색 조건(query, tags, customFilters, sort)에 부합하는 관광지들을 조회합니다.
+      responses:
+        "200":
+          description: 관광지 모음 조회에 성공했습니다.
+          headers:
+            X-Pagination-Page:
+              description: 현재 페이지 번호
+              schema:
+                type: integer
+            X-Pagination-Page-Size:
+              description: 현재 페이지 크기
+              schema:
+                type: integer
+            X-Pagination-Page-Limit:
+              description: 페이지 최대 크기
+              schema:
+                type: integer
+            X-Pagination-Total-Page:
+              description: 총 페이지 개수
+              schema:
+                type: integer
+            X-Pagination-Total-Item:
+              description: 총 아이템 개수
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TourSpotOverview"
+        "400":
+          description: 관광지 모음 조회에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 관광지 모음 조회에 실패했습니다. 사용자 맞춤 필터 사용을 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: 관광지 모음 조회에 실패했습니다. 검색 조건(tags, sort) 또는 페이지 파라미터(pageNo, pageSize)가 적절하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /tour-spots/map:
+    parameters:
+      - in: query
+        name: query
+        schema:
+          type: string
+        description: 검색 키워드
+      - in: query
+        name: tags
+        schema:
+          type: array
+          items:
+            type: string
+        description: 관광지 태그 모음
+      - in: query
+        name: customFilters
+        schema:
+          type: array
+          items:
+            type: string
+        description: 사용자 맞춤 필터
+      - in: query
+        name: minLat
+        schema:
+          type: integer
+        required: true
+        description: 최소 위도
+      - in: query
+        name: minLng
+        schema:
+          type: integer
+        required: true
+        description: 최소 경도
+      - in: query
+        name: maxLat
+        schema:
+          type: integer
+        required: true
+        description: 최대 위도
+      - in: query
+        name: maxLng
+        schema:
+          type: integer
+        required: true
+        description: 최대 경도
+        
+    get:
+      tags:
+        - 관광지
+      summary: 검색 조건에 부합하는 관광지 모음 조회 - 지도 출력용
+      description: 검색 조건(query, tags, customFilters)에 부합하는 관광지들을 조회합니다.
+      responses:
+        "200":
+          description: 관광지 모음 조회에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TourSpotOverview"
+        "400":
+          description: 관광지 모음 조회에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 관광지 모음 조회에 실패했습니다. 사용자 맞춤 필터 사용을 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: 관광지 모음 조회에 실패했습니다. 검색 조건(tags, sort) 또는 페이지 파라미터(pageNo, pageSize)가 적절하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /tour-spots/{tourSpotId}:
+    parameters:
+      - in: path
+        name: tourSpotId
+        required: true
+        schema:
+          type: string
+        description: 관광지 ID
+    get:
+      tags:
+        - 관광지
+      summary: 관광지 조회
+      description: 관광지(tourSpotId)를 조회합니다.
+      responses:
+        "200":
+          description: 관광지 조회에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TourSpot"
+        "400":
+          description: 관광지 조회에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 관광지 조회에 실패했습니다. 관광지 ID(tourSpotId)에 해당하는 관광지가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  
+  /tour-spots/{tourSpotId}/reviews:
+    parameters:
+      - in: path
+        name: tourSpotId
+        required: true
+        schema:
+          type: string
+        description: 관광지 ID
+    get:
+      tags:
+        - 관광지
+      summary: 관광지 후기 모음 조회
+      description: 관광지(tourSpotId)의 후기 모음을 조회합니다.
+      parameters:
+        - in: query
+          name: pageNo
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: 페이지 번호
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          description: 페이지 크기
+      responses:
+        "200":
+          description: 관광지 후기 모음 조회에 성공했습니다.
+          headers:
+            X-Pagination-Page:
+              description: 현재 페이지 번호
+              schema:
+                type: integer
+            X-Pagination-Page-Size:
+              description: 현재 페이지 크기
+              schema:
+                type: integer
+            X-Pagination-Page-Limit:
+              description: 페이지 최대 크기
+              schema:
+                type: integer
+            X-Pagination-Total-Page:
+              description: 총 페이지 개수
+              schema:
+                type: integer
+            X-Pagination-Total-Item:
+              description: 총 아이템 개수
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TourSpotReview"
+        "400":
+          description: 관광지 후기 모음 조회에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: 관광지 후기 모음 조회에 실패했습니다. 관광지 ID(tourSpotId)에 해당하는 관광지가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          description: 관광지 후기 모음 조회에 실패했습니다. 페이지 파라미터(pageNo, pageSize)가 적절하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - 관광지
+      summary: 관광지 후기 추가
+      description: 관광지(tourSpotId) 후기를 추가합니다.
+      security:
+        - CookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TourSpotReview"
+      responses:
+        "201":
+          description: 관광지 후기 추가에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TourSpotReview"
+        "400":
+          description: 관광지 후기 추가에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 관광지 후기 추가에 실패했습니다. 추가를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: 관광지 후기 추가에 실패했습니다. 회원은 자신의 후기만 추가할 수 있습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: 관광지 후기 추가에 실패했습니다. 관광지 ID(tourSpotId)에 해당하는 관광지가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /tour-spot-reviews/{tourSpotReviewId}:
+    parameters:
+      - in: path
+        name: tourSpotReviewId
+        required: true
+        schema:
+          type: string
+        description: 관광지 후기 ID
+    delete:
+      tags:
+        - 관광지
+      summary: 관광지 후기 삭제
+      description: 관광지(tourSpotId)의 후기를 삭제합니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "204":
+          description: 관광지 후기 삭제에 성공했습니다.
+        "400":
+          description: 관광지 후기 삭제에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 관광지 후기 삭제에 실패했습니다. 삭제를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: 관광지 후기 삭제에 실패했습니다. 회원은 자신의 후기만 삭제할 수 있습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: 관광지 후기 삭제에 실패했습니다. 후기가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /tour-spot-reviews/{tourSpotReviewId}/likes:
+    parameters:
+      - in: path
+        name: tourSpotReviewId
+        required: true
+        schema:
+          type: string
+        description: 관광지 후기 ID
+    put:
+      tags:
+        - 관광지
+      summary: 관광지 후기 "공감" 변경
+      description: 회원(userId)이 관광지 후기(tourSpotReviewId)를 "공감" 또는 "공감 취소"합니다.
+      security:
+        - CookieAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TourSpotReviewLike"
+      responses:
+        "200":
+          description: 관광지 후기 공감 변경에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TourSpotReviewLike"
+        "400":
+          description: 관광지 후기 공감 변경에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 관광지 후기 공감 변경에 실패했습니다. 변경을 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: 관광지 후기 공감 변경에 실패했습니다. 회원은 자신의 공감만 변경할 수 있습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: 관광지 후기 공감 변경에 실패했습니다. 회원(userId) 또는 관광지 후기(tourSpotReviewId)가 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      
+  /recommendations/{recommendationType}:
+    parameters:
+      - in: path
+        name: recommendationType
+        required: true
+        schema:
+          type: string
+          enum:
+            - main
+    get:
+      tags:
+        - 추천
+      summary: 관광지 추천 조회
+      description: 추천 종류(recommendationType)에 따라 추천된 관광지를 조회합니다.
+      security:
+        - CookieAuth: []
+      responses:
+        "200":
+          description: 관광지 추천 조회에 성공했습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TourSpotRecommendations"
+        "400":
+          description: 관광지 추천 조회에 실패했습니다. 요청 형태가 유효하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: 관광지 추천 조회에 실패했습니다. 조회를 위해서는 인증이 필요합니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: 관광지 추천 조회에 실패했습니다. 추천 종류(recommendationType)에 해당하는 관광지 추천이 존재하지 않습니다.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    
+    
+
+
+
+components:
+  securitySchemes:
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID
+  schemas:
+    TrueOnly:
+      type: boolean
+      enum:
+        - true
+    FalseOnly:
+      type: boolean
+      enum:
+        - false
+    
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    UserCredentials:
+      type: object
+      properties:
+        id:
+          type: string
+        password:
+          type: string
+      required:
+        - id
+        - password
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+      required:
+        - id
+        - password
+        - name
+        - email
+    UserPatch:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+    PasswordPatch:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+        newPassword:
+          type: string
+      required:
+        - oldPassword
+        - newPassword
+    
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+        - id
+        - name
+
+    Bookmark:
+      type: object
+      properties:
+        userId:
+          type: string
+          readOnly: true
+        tourSpotId:
+          type: string
+        tourSpotOverview:
+          type: object
+          properties:
+            name:
+              type: string
+            address:
+              type: string
+            lat:
+              type: number
+              minimum: -90
+              maximum: 90
+            lng:
+              type: number
+              minimum: -180
+              maximum: 180
+            imageUrl:
+              type: string
+              format: url
+            description:
+              type: string
+            phoneNumber:
+              type: string
+            tags:
+              type: array
+              items:
+                type: string
+          readOnly: true
+      required:
+        - userId
+        - tourSpotId
+    
+    TourSpot:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        address:
+          type: string
+        lat:
+          type: number
+          minimum: -90
+          maximum: 90
+        lng:
+          type: number
+          minimum: -180
+          maximum: 180
+        imageUrl:
+          type: string
+          format: url
+        description:
+          type: string
+        phoneNumber:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    
+    TourSpotOverview:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        address:
+          type: string
+        lat:
+          type: number
+          minimum: -90
+          maximum: 90
+        lng:
+          type: number
+          minimum: -180
+          maximum: 180
+        imageUrl:
+          type: string
+          format: url
+        tags:
+          type: array
+          items:
+            type: string
+    
+    TourSpotReview:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        tourSpotId:
+          type: string
+          readOnly: true
+        userId:
+          type: string
+        content:
+          type: string
+        likes:
+          type: integer
+          minimum: 0
+          readOnly: true
+    
+    TourSpotReviewLike:
+      type: object
+      properties:
+        userId:
+          type: string
+        tourSpotReviewId:
+          type: string
+          readOnly: true
+        liked:
+          type: boolean
+    
+    TourSpotRecommendations:
+      type: array
+      items:
+        $ref: "#/components/schemas/TourSpotOverview"

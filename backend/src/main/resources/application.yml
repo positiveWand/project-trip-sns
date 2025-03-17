@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: tourin
+  datasource:
+    url: jdbc:mysql://localhost:3306/tourin?serverTimezone=Asia/Seoul
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  logging.level:
+    org.hibernate.SQL: debug

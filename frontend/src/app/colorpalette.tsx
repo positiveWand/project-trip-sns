@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils';
 
 function ColorPalette() {
   const colors = [
@@ -11,6 +11,10 @@ function ColorPalette() {
     'muted',
     'accent',
     'destructive',
+    'unknown',
+    'low',
+    'medium',
+    'high',
     'border',
     'input',
     'ring',
@@ -19,7 +23,7 @@ function ColorPalette() {
     'chart-3',
     'chart-4',
     'chart-5',
-  ]
+  ];
 
   const backgroundColor = [
     'bg-background',
@@ -31,6 +35,10 @@ function ColorPalette() {
     'bg-muted',
     'bg-accent',
     'bg-destructive',
+    'bg-unknown',
+    'bg-low',
+    'bg-medium',
+    'bg-high',
     'bg-border',
     'bg-input',
     'bg-ring',
@@ -39,25 +47,23 @@ function ColorPalette() {
     'bg-chart-3',
     'bg-chart-4',
     'bg-chart-5',
-  ]
+  ];
 
   return (
     <div className='flex flex-col py-10 px-32 text-center'>
-      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+      <h1 className='scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl'>
         Color Palette
       </h1>
       <div className='flex flex-wrap'>
-        {
-          colors.map((color, index) => (
-            <div>
-              <span>{color}</span>
-              <div className={cn('w-52 h-52 m-1', backgroundColor[index])}></div>
-            </div>
-          ))
-        }
+        {colors.map((color, index) => (
+          <div>
+            <span>{color}</span>
+            <div className={cn('w-52 h-52 m-1', backgroundColor[index])}></div>
+          </div>
+        ))}
       </div>
     </div>
-  )
+  );
 }
 
-export default ColorPalette
+export default ColorPalette;
