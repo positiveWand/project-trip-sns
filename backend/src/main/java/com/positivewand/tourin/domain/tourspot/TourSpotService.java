@@ -17,6 +17,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class TourSpotService {
+    public static int MIN_QUERY_LENGTH = 2;
+
     private final TourSpotRepository tourSpotRepository;
 
     public TourSpotDto findTourSpot(Long id) {
@@ -36,8 +38,9 @@ public class TourSpotService {
             int page,
             int size
     ) {
-        query = query.replaceAll(" ", "");
-        query = String.join(" ", Ngram.parseNgrams(2, query));
+        if (query.length() < MIN_QUERY_LENGTH) {
+            throw new IllegalArgumentException("검색 문자열은 길이가 " + MIN_QUERY_LENGTH + "이상 이어야합니다");
+        }
 
         Page<TourSpot> tourSpots = null;
         if (tags.isEmpty()) {
@@ -56,8 +59,9 @@ public class TourSpotService {
             List<String> tags,
             LatLngBounds latLngBounds
     ) {
-        query = query.replaceAll(" ", "");
-        query = String.join(" ", Ngram.parseNgrams(2, query));
+        if (query.length() < MIN_QUERY_LENGTH) {
+            throw new IllegalArgumentException("검색 문자열은 길이가 " + MIN_QUERY_LENGTH + "이상 이어야합니다");
+        }
 
         List<TourSpot> tourSpots = null;
         if (tags.isEmpty()) {
