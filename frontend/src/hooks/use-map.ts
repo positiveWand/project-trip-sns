@@ -75,7 +75,7 @@ function dispatchFocusedMarker(action: FocusedMarkerAction) {
   switch (action.type) {
     case 'SET_FOCUSED_MARKER':
       if (!MAP_STATE.map) {
-        throw Error('지도 객체가 없습니다.');
+        return;
       }
 
       if (MAP_STATE.markers[action.markerId]) {
@@ -96,7 +96,7 @@ function dispatchFocusedMarker(action: FocusedMarkerAction) {
       break;
     case 'REMOVE_FOCUSED_MARKER':
       if (!MAP_STATE.map) {
-        throw Error('지도 객체가 없습니다.');
+        return;
       }
 
       const focusedMarkerId = MAP_STATE.focusedMarker?.id;
@@ -132,7 +132,7 @@ function dispatchMarkers(action: MarkersAction) {
   switch (action.type) {
     case 'SET_MARKERS':
       if (!MAP_STATE.map) {
-        throw Error('지도 객체가 없습니다.');
+        return;
       }
 
       const newMarkers: typeof MAP_STATE.markers = {};
@@ -170,7 +170,7 @@ function dispatchMarkers(action: MarkersAction) {
       break;
     case 'REMOVE_MARKERS':
       if (!MAP_STATE.map) {
-        throw Error('지도 객체가 없습니다.');
+        return;
       }
 
       Object.values(MAP_STATE.markers).map((marker) => {
