@@ -132,6 +132,11 @@ export function MapInfoBar({ open, onOpenChange, info, className }: MapInfoBarPr
   };
   const bookmarkToggleHandler = async (bookmark: boolean) => {
     if (!sessionInfo || !info) {
+      toast({
+        title: '북마크 추가 실패',
+        description: '북마크 기능을 사용하기 위해서는 로그인이 필요합니다.',
+        variant: 'destructive',
+      });
       return;
     }
 
@@ -242,7 +247,6 @@ export function MapInfoBar({ open, onOpenChange, info, className }: MapInfoBarPr
               </div>
               <div className='mt-2 flex items-center justify-center gap-4'>
                 <BookmarkToggle
-                  disabled={!sessionActive}
                   pressed={Boolean(isBookmark)}
                   onPressedChange={bookmarkToggleHandler}
                 />
