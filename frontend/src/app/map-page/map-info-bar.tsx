@@ -76,15 +76,25 @@ export function MapInfoBar({ open, onOpenChange, info, className }: MapInfoBarPr
   const [reviewLikes, setReviewLikes] = useProxyState(
     reviews,
     async (state) => {
-      if (!state || !sessionInfo) return null;
+      if (!state) return;
+
+      const result: Record<string, ReviewLikeInfo> = {};
+      state.data.map((review) => {
+        result[review.id] = {
+          liked: false,
+          count: review.likes,
+        };
+      });
+
+      if (!sessionInfo) return result;
+
       const response = await requestGetTourSpotReviewLikes(
         sessionInfo.id,
         state.data.map((review) => review.id),
       );
 
-      if (!response.success) return null;
+      if (!response.success) return result;
 
-      const result: Record<string, ReviewLikeInfo> = {};
       for (let i = 0; i < response.data.length; i++) {
         result[response.data[i].tourSpotReviewId] = {
           liked: response.data[i].liked,
@@ -122,6 +132,11 @@ export function MapInfoBar({ open, onOpenChange, info, className }: MapInfoBarPr
   };
   const bookmarkToggleHandler = async (bookmark: boolean) => {
     if (!sessionInfo || !info) {
+      toast({
+        title: '북마크 추가 실패',
+        description: '북마크 기능을 사용하기 위해서는 로그인이 필요합니다.',
+        variant: 'destructive',
+      });
       return;
     }
 
@@ -232,7 +247,6 @@ export function MapInfoBar({ open, onOpenChange, info, className }: MapInfoBarPr
               </div>
               <div className='mt-2 flex items-center justify-center gap-4'>
                 <BookmarkToggle
-                  disabled={!sessionActive}
                   pressed={Boolean(isBookmark)}
                   onPressedChange={bookmarkToggleHandler}
                 />
@@ -287,10 +301,14 @@ export function MapInfoBar({ open, onOpenChange, info, className }: MapInfoBarPr
               <div>
                 {reviews && reviewLikes
                   ? reviews.data.map((review) => {
-                      if (!reviewLikes[review.id]) return null;
-
+                      if (!(review.id in reviewLikes)) return;
                       const likeToggleHandler = async (value: boolean) => {
                         if (!sessionInfo) {
+                          toast({
+                            title: '공감 불가',
+                            description: '공감을 위해서는 로그인이 필요합니다.',
+                            variant: 'destructive',
+                          });
                           return;
                         }
 

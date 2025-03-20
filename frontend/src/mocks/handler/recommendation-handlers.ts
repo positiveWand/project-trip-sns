@@ -17,15 +17,15 @@ function toOverview(tourSpot: TourSpot): TourSpotOverview {
 
 function tagView(tag: string) {
   const map: Record<string, string> = {
-    nature: '자연',
-    history: '역사',
-    rest: '휴양',
-    experience: '체험',
-    industry: '산업',
-    architecture: '건축/조형',
-    culture: '문화',
-    festival: '축제',
-    concert: '공연/행사',
+    NATURE: '자연',
+    HISTORY: '역사',
+    REST: '휴양',
+    EXPERIENCE: '체험',
+    INDUSTRY: '산업',
+    ARCHITECTURE: '건축/조형',
+    CULTURE: '문화',
+    FESTIVAL: '축제',
+    CONCERT: '공연/행사',
   };
   return map[tag];
 }
