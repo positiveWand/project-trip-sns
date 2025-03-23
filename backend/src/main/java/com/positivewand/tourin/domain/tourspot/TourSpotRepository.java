@@ -60,6 +60,36 @@ public interface TourSpotRepository extends JpaRepository<TourSpot, Long> {
 
     @Query(
         value = """
+            SELECT DISTINCT
+                filtered_ts.id as id,
+                filtered_ts.name as name,
+                filtered_ts.description as description,
+                filtered_ts.image_url as image_url,
+                filtered_ts.full_address as full_address,
+                filtered_ts.address1 as address2,
+                filtered_ts.address2 as address1,
+                filtered_ts.province_code as province_code,
+                filtered_ts.district_code as district_code,
+                filtered_ts.lat as lat,
+                filtered_ts.lng as lng
+            FROM (SELECT ts.* FROM tour_spot ts) filtered_ts
+            LEFT JOIN tour_spot_tag tag ON filtered_ts.id = tag.tour_spot_id
+            WHERE (tag.tag IN (:tags))
+        """,
+        countQuery = """
+            SELECT COUNT(DISTINCT *)
+            FROM (SELECT ts.* FROM tour_spot ts) filtered_ts
+            LEFT JOIN tour_spot_tag tag ON filtered_ts.id = tag.tour_spot_id
+            WHERE (tag.tag IN (:tags))
+        """,
+            nativeQuery = true)
+    Page<TourSpot> findByTags(
+            @Param("tags") Collection<String> tags,
+            Pageable pageable
+    );
+
+    @Query(
+        value = """
             SELECT *
             FROM tour_spot ts
             WHERE (MATCH(ts.name) AGAINST(:query IN BOOLEAN MODE))
@@ -129,6 +159,52 @@ public interface TourSpotRepository extends JpaRepository<TourSpot, Long> {
     )
     List<TourSpot> findByNameAndTagsAndLatLngBounds(
             @Param("query") String query,
+            @Param("tags") Collection<String> tags,
+            @Param("minLat") Double minLat,
+            @Param("minLng") Double minLng,
+            @Param("maxLat") Double maxLat,
+            @Param("maxLng") Double maxLng
+    );
+
+    @Query(
+        value = """
+            SELECT DISTINCT
+                filtered_ts.id as id,
+                filtered_ts.name as name,
+                filtered_ts.description as description,
+                filtered_ts.image_url as image_url,
+                filtered_ts.full_address as full_address,
+                filtered_ts.address1 as address2,
+                filtered_ts.address2 as address1,
+                filtered_ts.province_code as province_code,
+                filtered_ts.district_code as district_code,
+                filtered_ts.lat as lat,
+                filtered_ts.lng as lng
+            FROM (
+                SELECT ts.* FROM tour_spot ts
+                WHERE (ts.lat >= :minLat)
+                AND (ts.lat <= :maxLat)
+                AND (ts.lng >= :minLng)
+                AND (ts.lng <= :maxLng)
+            ) filtered_ts
+            LEFT JOIN tour_spot_tag tag ON filtered_ts.id = tag.tour_spot_id
+            WHERE (tag.tag IN (:tags))
+        """,
+        countQuery = """
+            SELECT COUNT(DISTINCT *)
+            FROM (
+                SELECT ts.* FROM tour_spot ts
+                WHERE (ts.lat >= :minLat)
+                AND (ts.lat <= :maxLat)
+                AND (ts.lng >= :minLng)
+                AND (ts.lng <= :maxLng)
+            ) filtered_ts
+            LEFT JOIN tour_spot_tag tag ON filtered_ts.id = tag.tour_spot_id
+            WHERE (tag.tag IN (:tags))
+        """,
+            nativeQuery = true
+    )
+    List<TourSpot> findByTagsAndLatLngBounds(
             @Param("tags") Collection<String> tags,
             @Param("minLat") Double minLat,
             @Param("minLng") Double minLng,

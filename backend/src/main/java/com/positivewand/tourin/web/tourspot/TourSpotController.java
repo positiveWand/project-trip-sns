@@ -52,13 +52,23 @@ public class TourSpotController {
             throw new IllegalArgumentException("존재하지 않는 정렬 기준.");
         }
 
-        Page<TourSpotDto> tourSpotDtoPage = tourSpotService.findTourSpots(
-                query,
-                tags,
-                sortCriteria,
-                pageNo-1,
-                pageSize
-        );
+        Page<TourSpotDto> tourSpotDtoPage = null;
+        if(query.isEmpty()) {
+            tourSpotDtoPage = tourSpotService.findTourSpots(
+                    tags,
+                    sortCriteria,
+                    pageNo-1,
+                    pageSize
+            );
+        } else {
+            tourSpotDtoPage = tourSpotService.findTourSpots(
+                    query,
+                    tags,
+                    sortCriteria,
+                    pageNo-1,
+                    pageSize
+            );
+        }
 
         return tourSpotDtoPage.map(TourSpotOverviewResponse::createFromTourSpotDto);
     }
@@ -77,11 +87,19 @@ public class TourSpotController {
             throw new IllegalArgumentException("대각선 길이가 30km 이하인 경우에만 지도에서 검색이 가능합니다.");
         }
 
-        List<TourSpotDto> tourSpots = tourSpotService.findTourSpots(
-                query,
-                tags,
-                new TourSpotService.LatLngBounds(minLat, minLng, maxLat, maxLng)
-        );
+        List<TourSpotDto> tourSpots = null;
+        if(query.isEmpty()) {
+            tourSpots = tourSpotService.findTourSpots(
+                    tags,
+                    new TourSpotService.LatLngBounds(minLat, minLng, maxLat, maxLng)
+            );
+        } else {
+            tourSpots = tourSpotService.findTourSpots(
+                    query,
+                    tags,
+                    new TourSpotService.LatLngBounds(minLat, minLng, maxLat, maxLng)
+            );
+        }
 
         return tourSpots.stream().map(TourSpotOverviewResponse::createFromTourSpotDto).toList();
     }
