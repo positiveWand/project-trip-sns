@@ -17,7 +17,7 @@
   ├─ data: 프로젝트 데이터/AI/ML
   └─ document: 프로젝트 문서(설계 문서, issue 관련 회고)
 ```
-- `/document/issue`에서 프로젝트를 진행하며 해결한 이슈를 자세히 확인하실 수 있습니다
+- [`/document/issue`](/document/issue)에서 프로젝트를 진행하며 해결한 이슈를 자세히 확인하실 수 있습니다
 
 # 기술 스택
 ![프로젝트 기술](./document/image/tech-stack.jpg)
@@ -67,5 +67,5 @@
 
 ## 회원 조회
 ![회원 조회 데모](./document/image/user-demo.gif)
-- 궁금한 다른 회원에 정보를 조회할 수 있습니다
+- 궁금한 다른 회원의 정보를 조회할 수 있습니다
 - 회원이 북마크한 관광지를 조회할 수 있습니다
