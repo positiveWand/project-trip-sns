@@ -2,20 +2,23 @@ package com.positivewand.tourin.domain.tourspot.entity;
 
 import com.positivewand.tourin.domain.user.entity.BookmarkId;
 import jakarta.persistence.Embeddable;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
+@Setter
 public class TourSpotReviewLikeId implements Serializable {
     private Long userId;
     private Long tourSpotReviewId;
 
-    public TourSpotReviewLikeId() {}
+    public static TourSpotReviewLikeId create(Long userId, Long tourSpotReviewId) {
+        TourSpotReviewLikeId tourSpotReviewLikeId = new TourSpotReviewLikeId();
+        tourSpotReviewLikeId.setUserId(userId);
+        tourSpotReviewLikeId.setTourSpotReviewId(tourSpotReviewId);
 
-    public TourSpotReviewLikeId(Long userId, Long tourSpotReviewId) {
-        this.userId = userId;
-        this.tourSpotReviewId = tourSpotReviewId;
+        return tourSpotReviewLikeId;
     }
 
     @Override

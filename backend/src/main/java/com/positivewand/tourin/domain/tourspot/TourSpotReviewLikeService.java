@@ -31,7 +31,7 @@ public class TourSpotReviewLikeService {
             throw new NoSuchElementException("관광지 후기가 존재하지 않습니다.");
         }
 
-        Optional<TourSpotReviewLike> tourSpotReviewLike = tourSpotReviewLikeRepository.findById(new TourSpotReviewLikeId(user.get().getId(), tourSpotReviewId));
+        Optional<TourSpotReviewLike> tourSpotReviewLike = tourSpotReviewLikeRepository.findById(TourSpotReviewLikeId.create(user.get().getId(), tourSpotReviewId));
         return tourSpotReviewLike.isPresent();
     }
 
@@ -76,6 +76,6 @@ public class TourSpotReviewLikeService {
             throw new NoSuchElementException("관광지 후기가 존재하지 않습니다.");
         }
 
-        tourSpotReviewLikeRepository.deleteById(new TourSpotReviewLikeId(user.get().getId(), tourSpotReviewId));
+        tourSpotReviewLikeRepository.deleteById(TourSpotReviewLikeId.create(user.get().getId(), tourSpotReviewId));
     }
 }

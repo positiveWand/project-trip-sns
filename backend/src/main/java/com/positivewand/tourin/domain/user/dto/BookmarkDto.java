@@ -12,7 +12,7 @@ public record BookmarkDto(String username, Long tourSpotId, TourSpotDto tourSpot
         return new BookmarkDto(
             user.getUsername(),
             tourSpot.getId(),
-            TourSpotDto.createFromTourSpot(tourSpot)
+            TourSpotDto.create(tourSpot)
         );
     }
 }

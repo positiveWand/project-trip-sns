@@ -22,6 +22,6 @@ public class RecommendationService {
                 780778L
         ));
 
-        return tourSpots.stream().map(TourSpotDto::createFromTourSpot).toList();
+        return tourSpots.stream().map(TourSpotDto::create).toList();
     }
 }

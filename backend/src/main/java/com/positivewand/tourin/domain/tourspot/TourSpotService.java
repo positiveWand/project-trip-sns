@@ -26,7 +26,7 @@ public class TourSpotService {
             throw new NoSuchElementException("관광지가 없습니다.");
         }
 
-        return TourSpotDto.createFromTourSpot(tourSpot.get());
+        return TourSpotDto.create(tourSpot.get());
     }
 
     public Page<TourSpotDto> findTourSpots(
@@ -47,7 +47,7 @@ public class TourSpotService {
             tourSpots = tourSpotRepository.findByNameAndTags(query, tags, PageRequest.of(page, size, sort));
         }
 
-        return tourSpots.map(TourSpotDto::createFromTourSpot);
+        return tourSpots.map(TourSpotDto::create);
     }
 
     public Page<TourSpotDto> findTourSpots(
@@ -63,7 +63,7 @@ public class TourSpotService {
             tourSpots = tourSpotRepository.findByTags(tags, PageRequest.of(page, size, sort));
         }
 
-        return tourSpots.map(TourSpotDto::createFromTourSpot);
+        return tourSpots.map(TourSpotDto::create);
     }
 
     public record LatLngBounds(double minLat, double minLng, double maxLat, double maxLng) {}
@@ -97,7 +97,7 @@ public class TourSpotService {
             );
         }
 
-        return tourSpots.stream().map(TourSpotDto::createFromTourSpot).toList();
+        return tourSpots.stream().map(TourSpotDto::create).toList();
     }
 
     public List<TourSpotDto> findTourSpots(
@@ -123,6 +123,6 @@ public class TourSpotService {
             );
         }
 
-        return tourSpots.stream().map(TourSpotDto::createFromTourSpot).toList();
+        return tourSpots.stream().map(TourSpotDto::create).toList();
     }
 }
