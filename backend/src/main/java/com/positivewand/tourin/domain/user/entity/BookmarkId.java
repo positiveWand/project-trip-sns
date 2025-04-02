@@ -1,20 +1,23 @@
 package com.positivewand.tourin.domain.user.entity;
 
 import jakarta.persistence.Embeddable;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
+@Setter
 public class BookmarkId implements Serializable {
     private Long userId;
     private Long tourSpotId;
 
-    public BookmarkId() {}
+    public static BookmarkId create(Long userId, Long tourSpotId) {
+        BookmarkId bookmarkId = new BookmarkId();
+        bookmarkId.setUserId(userId);
+        bookmarkId.setTourSpotId(tourSpotId);
 
-    public BookmarkId(Long userId, Long tourSpotId) {
-        this.userId = userId;
-        this.tourSpotId = tourSpotId;
+        return bookmarkId;
     }
 
     @Override

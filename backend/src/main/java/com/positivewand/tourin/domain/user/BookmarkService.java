@@ -41,7 +41,7 @@ public class BookmarkService {
             throw new NoSuchElementException("등록된 회원이 없습니다.");
         }
 
-        Optional<Bookmark> bookmark = bookmarkRepository.findById(new BookmarkId(user.get().getId(), tourSpotId));
+        Optional<Bookmark> bookmark = bookmarkRepository.findById(BookmarkId.create(user.get().getId(), tourSpotId));
 
         if(bookmark.isEmpty()) {
             throw new NoSuchElementException("관광지가 북마크에 존재하지 않습니다.");
@@ -64,7 +64,7 @@ public class BookmarkService {
             throw new NoSuchElementException("등록된 관광지가 없습니다.");
         }
 
-        Bookmark bookmark = new Bookmark(user.get(), tourSpot.get());
+        Bookmark bookmark = Bookmark.create(user.get(), tourSpot.get());
         bookmarkRepository.save(bookmark);
     }
 
@@ -76,7 +76,7 @@ public class BookmarkService {
             throw new NoSuchElementException("등록된 회원이 없습니다.");
         }
 
-        Optional<Bookmark> bookmark = bookmarkRepository.findById(new BookmarkId(user.get().getId(), tourSpotId));
+        Optional<Bookmark> bookmark = bookmarkRepository.findById(BookmarkId.create(user.get().getId(), tourSpotId));
 
         bookmark.ifPresent(bookmarkRepository::delete);
     }

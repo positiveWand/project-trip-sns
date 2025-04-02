@@ -28,19 +28,19 @@ public class UserService {
             throw new NoSuchElementException("등록된 회원이 없습니다.");
         }
 
-        return UserDto.createFromUser(user.get());
+        return UserDto.create(user.get());
     }
 
     public Page<UserDto> findUsers(int page, int size) {
         Page<User> users = userRepository.findAll(PageRequest.of(page, size, Sort.by("username").ascending()));
 
-        return users.map(UserDto::createFromUser);
+        return users.map(UserDto::create);
     }
 
     public Page<UserDto> findUsers(String query, int page, int size) {
         Page<User> users = userRepository.findByUsernameContaining(query, PageRequest.of(page, size, Sort.by("username").ascending()));
 
-        return users.map(UserDto::createFromUser);
+        return users.map(UserDto::create);
     }
 
     @Transactional
@@ -51,7 +51,7 @@ public class UserService {
             throw new IllegalStateException("이미 가입된 회원이 있습니다.");
         }
 
-        User user = User.createUser(username, password, name, email);
+        User user = User.create(username, password, name, email);
         userRepository.save(user);
     }
 
