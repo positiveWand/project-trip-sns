@@ -13,7 +13,6 @@ import com.positivewand.tourin.web.tourspot.request.AddTourSpotReviewRequest;
 import com.positivewand.tourin.web.tourspot.request.PutTourSpotReviewLikeRequest;
 import com.positivewand.tourin.web.tourspot.response.TourSpotOverviewResponse;
 import com.positivewand.tourin.web.tourspot.response.TourSpotResponse;
-import com.positivewand.tourin.web.tourspot.response.TourSpotReviewLikeResponse;
 import com.positivewand.tourin.web.tourspot.response.TourSpotReviewResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -140,7 +139,7 @@ public class TourSpotController {
 
     @PutMapping("/tour-spot-reviews/{tourSpotReviewId}/likes")
     @ResponseStatus(HttpStatus.OK)
-    public TourSpotReviewLikeResponse putTourSpotReviewLike(
+    public void putTourSpotReviewLike(
             @PathVariable(name = "tourSpotReviewId") Long tourSpotReviewId,
             @RequestBody PutTourSpotReviewLikeRequest putTourSpotReviewLikeRequest
     ) {
@@ -152,18 +151,8 @@ public class TourSpotController {
 
         if(putTourSpotReviewLikeRequest.liked()) {
             tourSpotReviewLikeService.addReviewLike(putTourSpotReviewLikeRequest.userId(), tourSpotReviewId);
-            return new TourSpotReviewLikeResponse(
-                    userDetails.getUsername(),
-                    tourSpotReviewId.toString(),
-                    true
-            );
         } else {
             tourSpotReviewLikeService.deleteReviewLike(putTourSpotReviewLikeRequest.userId(), tourSpotReviewId);
-            return new TourSpotReviewLikeResponse(
-                    userDetails.getUsername(),
-                    tourSpotReviewId.toString(),
-                    false
-            );
         }
     }
 }

@@ -983,10 +983,6 @@ paths:
       responses:
         "200":
           description: 관광지 후기 공감 변경에 성공했습니다.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TourSpotReviewLike"
         "400":
           description: 관광지 후기 공감 변경에 실패했습니다. 요청 형태가 유효하지 않습니다.
           content:
