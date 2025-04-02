@@ -31,7 +31,7 @@ public class BookmarkService {
 
         Page<Bookmark> bookmarks = bookmarkRepository.findByUserId(user.get().getId(), PageRequest.of(page, size));
 
-        return bookmarks.map(BookmarkDto::createFromBookmark);
+        return bookmarks.map(BookmarkDto::create);
     }
 
     public BookmarkDto findBookmark(String username, Long tourSpotId) {
@@ -47,7 +47,7 @@ public class BookmarkService {
             throw new NoSuchElementException("관광지가 북마크에 존재하지 않습니다.");
         }
 
-        return BookmarkDto.createFromBookmark(bookmark.get());
+        return BookmarkDto.create(bookmark.get());
     }
 
     @Transactional
