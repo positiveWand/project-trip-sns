@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final CustomUserDetailsService customUserDetailsService;
     private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final SecurityContextRepository securityContextRepository;
     private final SecurityContextLogoutHandler securityContextLogoutHandler;
@@ -41,7 +40,7 @@ public class AuthController {
     public UserResponse signup(@RequestBody SignupRequest signupRequest) {
         userService.createUser(
                 signupRequest.id(),
-                passwordEncoder.encode(signupRequest.password()),
+                signupRequest.password(),
                 signupRequest.name(),
                 signupRequest.email()
         );
@@ -136,11 +135,6 @@ public class AuthController {
         String oldPassword = updatePasswordRequest.oldPassword();
         String newPassword = updatePasswordRequest.newPassword();
 
-        // 기존 비밀번호 검사
-        if(!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            throw new BadCredentialsException("기존 비밀번호가 일치하지 않습니다.");
-        }
-
-        userService.changePassword(user.getUsername(), passwordEncoder.encode(newPassword));
+        userService.changePassword(user.getUsername(), oldPassword, newPassword);
     }
 }
