@@ -15,7 +15,7 @@ public record TourSpotDto(
         String phoneNumber,
         List<String> tags
 ) {
-    public static TourSpotDto createFromTourSpot(TourSpot entity) {
+    public static TourSpotDto create(TourSpot entity) {
         return new TourSpotDto(
                 entity.getId(),
                 entity.getName(),

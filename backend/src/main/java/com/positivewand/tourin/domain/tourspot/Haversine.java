@@ -1,4 +1,4 @@
-package com.positivewand.tourin.web.tourspot;
+package com.positivewand.tourin.domain.tourspot;
 
 public class Haversine {
     private static final double EARTH_RADIUS = 6378;

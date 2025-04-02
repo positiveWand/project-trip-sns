@@ -33,7 +33,7 @@ public class TourSpotReview {
     @OneToMany(mappedBy = "tourSpotReview")
     private List<TourSpotReviewLike> likes;
 
-    public static TourSpotReview createTourSpotReview(TourSpot tourSpot, User user, String content, LocalDateTime createdAt) {
+    public static TourSpotReview create(TourSpot tourSpot, User user, String content, LocalDateTime createdAt) {
         TourSpotReview tourSpotReview = new TourSpotReview();
 
         if(content.length() > 500) {

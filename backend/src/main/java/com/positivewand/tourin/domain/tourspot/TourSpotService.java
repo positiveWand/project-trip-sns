@@ -26,7 +26,7 @@ public class TourSpotService {
             throw new NoSuchElementException("관광지가 없습니다.");
         }
 
-        return TourSpotDto.createFromTourSpot(tourSpot.get());
+        return TourSpotDto.create(tourSpot.get());
     }
 
     public Page<TourSpotDto> findTourSpots(
@@ -47,7 +47,7 @@ public class TourSpotService {
             tourSpots = tourSpotRepository.findByNameAndTags(query, tags, PageRequest.of(page, size, sort));
         }
 
-        return tourSpots.map(TourSpotDto::createFromTourSpot);
+        return tourSpots.map(TourSpotDto::create);
     }
 
     public Page<TourSpotDto> findTourSpots(
@@ -63,7 +63,7 @@ public class TourSpotService {
             tourSpots = tourSpotRepository.findByTags(tags, PageRequest.of(page, size, sort));
         }
 
-        return tourSpots.map(TourSpotDto::createFromTourSpot);
+        return tourSpots.map(TourSpotDto::create);
     }
 
     public record LatLngBounds(double minLat, double minLng, double maxLat, double maxLng) {}
@@ -75,6 +75,9 @@ public class TourSpotService {
     ) {
         if (query.length() < MIN_QUERY_LENGTH) {
             throw new IllegalArgumentException("검색 문자열은 길이가 " + MIN_QUERY_LENGTH + "이상 이어야합니다");
+        }
+        if (Haversine.calculateDistance(latLngBounds.minLat, latLngBounds.minLng, latLngBounds.maxLat, latLngBounds.maxLng) > 30) {
+            throw new IllegalArgumentException("대각선 길이가 30km 이하인 경우에만 지도에서 검색이 가능합니다.");
         }
 
         List<TourSpot> tourSpots = null;
@@ -97,13 +100,17 @@ public class TourSpotService {
             );
         }
 
-        return tourSpots.stream().map(TourSpotDto::createFromTourSpot).toList();
+        return tourSpots.stream().map(TourSpotDto::create).toList();
     }
 
     public List<TourSpotDto> findTourSpots(
             List<String> tags,
             LatLngBounds latLngBounds
     ) {
+        if (Haversine.calculateDistance(latLngBounds.minLat, latLngBounds.minLng, latLngBounds.maxLat, latLngBounds.maxLng) > 30) {
+            throw new IllegalArgumentException("대각선 길이가 30km 이하인 경우에만 지도에서 검색이 가능합니다.");
+        }
+        
         List<TourSpot> tourSpots = null;
         if (tags.isEmpty()) {
             tourSpots = tourSpotRepository.findByTagsAndLatLngBounds(
@@ -123,6 +130,6 @@ public class TourSpotService {
             );
         }
 
-        return tourSpots.stream().map(TourSpotDto::createFromTourSpot).toList();
+        return tourSpots.stream().map(TourSpotDto::create).toList();
     }
 }

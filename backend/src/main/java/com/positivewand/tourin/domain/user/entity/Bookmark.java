@@ -3,10 +3,12 @@ package com.positivewand.tourin.domain.user.entity;
 import com.positivewand.tourin.domain.tourspot.entity.TourSpot;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "bookmark")
 @Getter
+@Setter
 public class Bookmark {
     @EmbeddedId
     private BookmarkId id;
@@ -21,11 +23,12 @@ public class Bookmark {
     @JoinColumn(name = "tour_spot_id")
     private TourSpot tourSpot;
 
-    public Bookmark() {}
+    public static Bookmark create(User user, TourSpot tourSpot) {
+        Bookmark bookmark = new Bookmark();
+        bookmark.setId(BookmarkId.create(user.getId(), tourSpot.getId()));
+        bookmark.setUser(user);
+        bookmark.setTourSpot(tourSpot);
 
-    public Bookmark(User user, TourSpot tourSpot) {
-        this.id = new BookmarkId(user.getId(), tourSpot.getId());
-        this.user = user;
-        this.tourSpot = tourSpot;
+        return bookmark;
     }
 }

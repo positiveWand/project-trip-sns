@@ -6,13 +6,13 @@ import com.positivewand.tourin.domain.user.entity.Bookmark;
 import com.positivewand.tourin.domain.user.entity.User;
 
 public record BookmarkDto(String username, Long tourSpotId, TourSpotDto tourSpotDto) {
-    public static BookmarkDto createFromBookmark(Bookmark bookmark) {
+    public static BookmarkDto create(Bookmark bookmark) {
         User user = bookmark.getUser();
         TourSpot tourSpot = bookmark.getTourSpot();
         return new BookmarkDto(
             user.getUsername(),
             tourSpot.getId(),
-            TourSpotDto.createFromTourSpot(tourSpot)
+            TourSpotDto.create(tourSpot)
         );
     }
 }

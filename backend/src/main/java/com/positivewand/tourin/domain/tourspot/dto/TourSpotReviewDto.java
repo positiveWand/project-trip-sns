@@ -9,13 +9,13 @@ public record TourSpotReviewDto(
     String content,
     Long likes
 ) {
-    public static TourSpotReviewDto createFromEntity(TourSpotReview tourSpotReview) {
+    public static TourSpotReviewDto create(TourSpotReview tourSpotReview) {
         return new TourSpotReviewDto(
             tourSpotReview.getId(),
             tourSpotReview.getTourSpot().getId(),
             tourSpotReview.getUser().getUsername(),
             tourSpotReview.getContent(),
-            0L
+            tourSpotReview.getLikesCount()
         );
     }
 }

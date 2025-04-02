@@ -24,8 +24,8 @@ public class TourSpotReviewLike {
 
     public static TourSpotReviewLike create(User user, TourSpotReview tourSpotReview) {
         TourSpotReviewLike tourSpotReviewLike = new TourSpotReviewLike();
-
-        tourSpotReviewLike.setId(new TourSpotReviewLikeId(user.getId(), tourSpotReview.getId()));
+        
+        tourSpotReviewLike.setId(TourSpotReviewLikeId.create(user.getId(), tourSpotReview.getId()));
 
         tourSpotReviewLike.setUser(user);
         tourSpotReviewLike.setTourSpotReview(tourSpotReview);

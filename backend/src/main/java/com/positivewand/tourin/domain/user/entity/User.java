@@ -22,7 +22,7 @@ public class User {
     @Column(name = "email")
     private String email;
 
-    public static User createUser(String username, String password, String name, String email) {
+    public static User create(String username, String password, String name, String email) {
         User user = new User();
         user.setUsername(username);
         user.setPassword(password);

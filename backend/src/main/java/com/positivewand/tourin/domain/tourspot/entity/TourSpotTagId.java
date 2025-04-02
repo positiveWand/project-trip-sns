@@ -14,13 +14,6 @@ public class TourSpotTagId implements Serializable {
     @Enumerated(EnumType.STRING)
     private TourSpotCategory tag;
 
-    public TourSpotTagId() {}
-
-    public TourSpotTagId(Long tourSpotId, TourSpotCategory tag) {
-        this.tourSpotId = tourSpotId;
-        this.tag = tag;
-    }
-
     @Override
     public boolean equals(Object other) {
         if (this == other) return true;

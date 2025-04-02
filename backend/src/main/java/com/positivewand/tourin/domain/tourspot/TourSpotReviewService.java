@@ -59,11 +59,11 @@ public class TourSpotReviewService {
             throw new NoSuchElementException("등록된 회원이 없습니다.");
         }
 
-        TourSpotReview tourSpotReview = TourSpotReview.createTourSpotReview(tourSpot.get(), user.get(), content, LocalDateTime.now());
+        TourSpotReview tourSpotReview = TourSpotReview.create(tourSpot.get(), user.get(), content, LocalDateTime.now());
 
         tourSpotReviewRepository.save(tourSpotReview);
 
-        return TourSpotReviewDto.createFromEntity(tourSpotReview);
+        return TourSpotReviewDto.create(tourSpotReview);
     }
 
     @Transactional
