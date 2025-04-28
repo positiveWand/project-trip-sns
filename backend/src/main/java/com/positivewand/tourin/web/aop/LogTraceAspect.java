@@ -10,27 +10,27 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class LogTraceAspect {
-    public final static ThreadLocal<String> requestIdHolder = new ThreadLocal<>();
-    public final static ThreadLocal<String> jsessionIdHolder = new ThreadLocal<>();
-
     @Around("execution(* com.positivewand.tourin..*Controller.*(..)) || execution(* com.positivewand.tourin..*Service.*(..))")
-    public Object logTrace(ProceedingJoinPoint joinPoint) throws Throwable {
-        String requestId = LogTraceAspect.requestIdHolder.get();
-        String jsessionId = LogTraceAspect.jsessionIdHolder.get();
+    public Object traceMethodCall(ProceedingJoinPoint joinPoint) throws Throwable {
+        String requestId = LogTraceInitFilter.requestIdHolder.get();
         if (requestId == null) {
-            requestId = "ANONYMOUS";
+            requestId = "NO_REQUEST_ID";
         }
-        if (jsessionId == null) {
-            jsessionId = "NONE";
-        }
+
+        long callTime = System.currentTimeMillis();
+        long returnTime;
 
         try {
-            log.trace("[Request ID: {}, JSESSIONID: {}] 진입 - {} args={}", requestId, jsessionId, joinPoint.getSignature(), joinPoint.getArgs());
+            log.trace("[Request ID: {}] 진입 - {} args={}", requestId, joinPoint.getSignature(), joinPoint.getArgs());
             Object result = joinPoint.proceed();
-            log.trace("[Request ID: {}, JSESSIONID: {}] 탈출 - {} return={}", requestId, jsessionId, joinPoint.getSignature(), result);
+            returnTime = System.currentTimeMillis();
+            log.trace("[Request ID: {}] 탈출(CALL_TIME+{}ms) - {} return={}", requestId, returnTime-callTime, joinPoint.getSignature(), result);
+
             return result;
         } catch(Throwable e) {
-            log.error("[Request ID: {}, JSESSIONID: {}] 예외 - {} exception={}", requestId, jsessionId, joinPoint.getSignature(), e.toString());
+            returnTime = System.currentTimeMillis();
+            log.error("[Request ID: {}] 예외(CALL_TIME+{}ms) - {} exception={}", requestId, returnTime-callTime, joinPoint.getSignature(), e.toString());
+
             throw e;
         }
     }
