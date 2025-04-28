@@ -7,7 +7,6 @@ import com.positivewand.tourin.domain.tourspot.TourSpotReviewService;
 import com.positivewand.tourin.domain.tourspot.TourSpotService;
 import com.positivewand.tourin.domain.tourspot.dto.TourSpotDto;
 import com.positivewand.tourin.domain.tourspot.dto.TourSpotReviewDto;
-import com.positivewand.tourin.domain.tourspot.entity.TourSpotReview;
 import com.positivewand.tourin.web.aop.PaginationAspect.PaginationHeader;
 import com.positivewand.tourin.web.tourspot.request.AddTourSpotReviewRequest;
 import com.positivewand.tourin.web.tourspot.request.PutTourSpotReviewLikeRequest;
@@ -82,9 +81,6 @@ public class TourSpotController {
             @RequestParam(name = "maxLat") Double maxLat,
             @RequestParam(name = "maxLng") Double maxLng
     ) {
-        if (Haversine.calculateDistance(minLat, minLng, maxLat, maxLng) > 30) {
-            throw new IllegalArgumentException("대각선 길이가 30km 이하인 경우에만 지도에서 검색이 가능합니다.");
-        }
 
         List<TourSpotDto> tourSpots = null;
         if(query.isEmpty()) {
