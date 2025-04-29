@@ -1,6 +1,5 @@
 package com.positivewand.tourin.web.user;
 
-import com.positivewand.tourin.domain.auth.CustomUserDetails;
 import com.positivewand.tourin.domain.auth.CustomUserDetailsService;
 import com.positivewand.tourin.domain.tourspot.TourSpotReviewLikeService;
 import com.positivewand.tourin.domain.user.BookmarkService;
@@ -15,7 +14,6 @@ import com.positivewand.tourin.web.user.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -84,12 +82,6 @@ public class UserController {
             @PathVariable(name = "userId") String userId,
             @RequestBody AddBookmarkRequest addBookmarkRequest
     ) {
-        CustomUserDetails userDetails = userDetailsService.getCurrentContextUser();
-
-        if(!userDetails.getUsername().equals(userId)) {
-            throw new AccessDeniedException("회원은 자신의 북마크에만 추가할 수 있습니다.");
-        }
-
         bookmarkService.addBookmark(userId, addBookmarkRequest.tourSpotId());
     }
 
@@ -99,12 +91,6 @@ public class UserController {
             @PathVariable(name = "userId") String userId,
             @PathVariable(name = "tourSpotId") Long tourSpotId
     ) {
-        CustomUserDetails userDetails = userDetailsService.getCurrentContextUser();
-
-        if(!userDetails.getUsername().equals(userId)) {
-            throw new AccessDeniedException("회원은 자신의 북마크만 삭제할 수 있습니다.");
-        }
-        
         bookmarkService.deleteBookmark(userId, tourSpotId);
     }
 
