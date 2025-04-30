@@ -23,6 +23,9 @@ public class TourSpotReview {
     private LocalDateTime createdAt;
     @Column(name = "like_count")
     private Long likeCount;
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
