@@ -53,7 +53,7 @@ public class TourSpotReviewLikeService {
             throw new NoSuchElementException("등록된 회원이 없습니다.");
         }
 
-        Optional<TourSpotReview> tourSpotReview = tourSpotReviewRepository.findById(tourSpotReviewId);
+        Optional<TourSpotReview> tourSpotReview = tourSpotReviewRepository.findForUpdateById(tourSpotReviewId);
 
         if(tourSpotReview.isEmpty()) {
             throw new NoSuchElementException("관광지 후기가 존재하지 않습니다.");
@@ -72,7 +72,7 @@ public class TourSpotReviewLikeService {
             throw new NoSuchElementException("등록된 회원이 없습니다.");
         }
 
-        Optional<TourSpotReview> tourSpotReview = tourSpotReviewRepository.findById(tourSpotReviewId);
+        Optional<TourSpotReview> tourSpotReview = tourSpotReviewRepository.findForUpdateById(tourSpotReviewId);
 
         if(tourSpotReview.isEmpty()) {
             throw new NoSuchElementException("관광지 후기가 존재하지 않습니다.");
