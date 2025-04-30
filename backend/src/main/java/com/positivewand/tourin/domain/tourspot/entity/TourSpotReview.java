@@ -21,8 +21,8 @@ public class TourSpotReview {
     private String content;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-    @Column(name = "likes")
-    private Long likesCount;
+    @Column(name = "like_count")
+    private Long likeCount;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -45,7 +45,7 @@ public class TourSpotReview {
         tourSpotReview.setContent(content);
         tourSpotReview.setCreatedAt(createdAt);
 
-        tourSpotReview.setLikesCount(0L);
+        tourSpotReview.setLikeCount(0L);
 
         return tourSpotReview;
     }

@@ -40,6 +40,7 @@ public class TourSpotReviewService {
                 entity.getId(),
                 entity.getTourSpot().getId(),
                 entity.getUser().getUsername(),
+                entity.getCreatedAt(),
                 entity.getContent(),
                 tourSpotReviewLikeRepository.countByTourSpotReview(entity)
         ));
