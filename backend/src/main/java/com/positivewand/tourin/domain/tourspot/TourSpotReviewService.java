@@ -24,6 +24,16 @@ public class TourSpotReviewService {
     private final TourSpotReviewRepository tourSpotReviewRepository;
     private final TourSpotReviewLikeRepository tourSpotReviewLikeRepository;
 
+    public TourSpotReviewDto findTourSpotReview(Long tourSpotReviewId) {
+        Optional<TourSpotReview> tourSpotReview = tourSpotReviewRepository.findById(tourSpotReviewId);
+
+        if(tourSpotReview.isEmpty()) {
+            throw new NoSuchElementException("존재하지 않는 관광지 후기입니다.");
+        }
+
+        return TourSpotReviewDto.create(tourSpotReview.get());
+    }
+
     public Page<TourSpotReviewDto> findTourSpotReviews(Long tourSpotId, int page, int size) {
         Optional<TourSpot> tourSpot = tourSpotRepository.findById(tourSpotId);
 
@@ -42,7 +52,7 @@ public class TourSpotReviewService {
                 entity.getUser().getUsername(),
                 entity.getCreatedAt(),
                 entity.getContent(),
-                tourSpotReviewLikeRepository.countByTourSpotReview(entity)
+                entity.getLikeCount()
         ));
     }
 

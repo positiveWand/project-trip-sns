@@ -59,6 +59,8 @@ public class TourSpotReviewLikeService {
             throw new NoSuchElementException("관광지 후기가 존재하지 않습니다.");
         }
 
+        tourSpotReview.get().incrementLikeCount();
+
         tourSpotReviewLikeRepository.save(TourSpotReviewLike.create(user.get(), tourSpotReview.get()));
     }
 
@@ -75,6 +77,8 @@ public class TourSpotReviewLikeService {
         if(tourSpotReview.isEmpty()) {
             throw new NoSuchElementException("관광지 후기가 존재하지 않습니다.");
         }
+
+        tourSpotReview.get().decrementLikeCount();
 
         tourSpotReviewLikeRepository.deleteById(TourSpotReviewLikeId.create(user.get().getId(), tourSpotReviewId));
     }

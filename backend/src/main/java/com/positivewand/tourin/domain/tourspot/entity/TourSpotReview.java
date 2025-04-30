@@ -49,4 +49,11 @@ public class TourSpotReview {
 
         return tourSpotReview;
     }
+
+    public void incrementLikeCount() {
+        this.likeCount += 1;
+    }
+    public void decrementLikeCount() {
+        this.likeCount -= 1;
+    }
 }
