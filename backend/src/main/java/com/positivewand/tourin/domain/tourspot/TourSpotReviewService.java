@@ -70,7 +70,7 @@ public class TourSpotReviewService {
             throw new NoSuchElementException("등록된 회원이 없습니다.");
         }
 
-        TourSpotReview tourSpotReview = TourSpotReview.create(tourSpot.get(), user.get(), content, LocalDateTime.now());
+        TourSpotReview tourSpotReview = TourSpotReview.create(tourSpot.get(), user.get(), content, LocalDateTime.now(), 0L);
 
         tourSpotReviewRepository.save(tourSpotReview);
 

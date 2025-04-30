@@ -1,13 +1,17 @@
 package com.positivewand.tourin.domain.tourspot.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
 @Entity
 @Table(name = "tour_spot")
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 public class TourSpot {
     @Id

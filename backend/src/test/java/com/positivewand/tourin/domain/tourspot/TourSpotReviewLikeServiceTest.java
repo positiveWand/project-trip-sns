@@ -27,6 +27,8 @@ class TourSpotReviewLikeServiceTest {
     private UserService userService;
     @Autowired
     private TourSpotReviewService tourSpotReviewService;
+    @Autowired
+    private TourSpotScheduler tourSpotScheduler;
 
     TourSpotReviewDto testTourSpotReview;
 
@@ -67,13 +69,15 @@ class TourSpotReviewLikeServiceTest {
                     log.info("{}번 사용자 좋아요 요청 성공", userIdx);
                 } catch(Exception e) {
                     failCount.getAndIncrement();
-                    log.info("{}번 사용자 좋아요 요청 실패", userIdx);
+                    log.info("{}번 사용자 좋아요 요청 실패, 실패 원인: {}", userIdx, e.getMessage());
                 }
                 countDownLatch.countDown();
             });
         }
 
         countDownLatch.await();
+
+        tourSpotScheduler.syncTourSpotReviewLike();
 
         long afterCachedLikeCount = tourSpotReviewService.findTourSpotReview(TEST_REVIEW_ID).likeCount();
 
