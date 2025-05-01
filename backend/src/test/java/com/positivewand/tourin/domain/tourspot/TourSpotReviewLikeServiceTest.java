@@ -45,7 +45,7 @@ class TourSpotReviewLikeServiceTest {
 
     @Test
     void 후기_좋아요를_동시에_요청해도_모두_올바르게_처리된다() throws InterruptedException {
-        final int REQUEST_COUNT = 20;
+        final int REQUEST_COUNT = 500;
         final long TEST_REVIEW_ID = testTourSpotReview.id();
 
         List<UserDto> users = userService.findUsers(0, REQUEST_COUNT).stream().toList();
@@ -59,7 +59,6 @@ class TourSpotReviewLikeServiceTest {
 
         for (int i = 0; i < REQUEST_COUNT; i++) {
             final int userIdx = i;
-            Thread.sleep(10);
             executorService.execute(() -> {
                 UserDto user = users.get(userIdx);
 
