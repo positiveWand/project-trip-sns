@@ -50,7 +50,7 @@ public class TourSpotReview {
         tourSpotReview.setContent(content);
         tourSpotReview.setCreatedAt(createdAt);
 
-        tourSpotReview.setLikeCount(likeCount);
+        tourSpotReview.setLikeCount(Math.max(0L, likeCount));
 
         return tourSpotReview;
     }

@@ -82,4 +82,13 @@ public class TourSpotReviewLikeService {
 
         tourSpotReviewLikeRepository.deleteById(TourSpotReviewLikeId.create(user.get().getId(), tourSpotReviewId));
     }
+
+    @Transactional
+    public void syncTourSpotReviewLike(List<Long> tourSpotReviewKeys, Map<Long, Long> difference) {
+        List<TourSpotReview> tourSpotReviews = tourSpotReviewRepository.findForUpdateByIdIn(tourSpotReviewKeys);
+
+        for(TourSpotReview tourSpotReview: tourSpotReviews) {
+            tourSpotReview.setLikeCount(tourSpotReview.getLikeCount()+difference.get(tourSpotReview.getId()));
+        }
+    }
 }
