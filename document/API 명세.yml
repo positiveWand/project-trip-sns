@@ -1243,9 +1243,13 @@ components:
           readOnly: true
         userId:
           type: string
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
         content:
           type: string
-        likes:
+        likeCount:
           type: integer
           minimum: 0
           readOnly: true

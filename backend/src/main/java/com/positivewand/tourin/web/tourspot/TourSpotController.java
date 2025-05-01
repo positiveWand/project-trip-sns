@@ -1,13 +1,10 @@
 package com.positivewand.tourin.web.tourspot;
 
-import com.positivewand.tourin.domain.auth.CustomUserDetails;
-import com.positivewand.tourin.domain.auth.CustomUserDetailsService;
 import com.positivewand.tourin.domain.tourspot.TourSpotReviewLikeService;
 import com.positivewand.tourin.domain.tourspot.TourSpotReviewService;
 import com.positivewand.tourin.domain.tourspot.TourSpotService;
 import com.positivewand.tourin.domain.tourspot.dto.TourSpotDto;
 import com.positivewand.tourin.domain.tourspot.dto.TourSpotReviewDto;
-import com.positivewand.tourin.domain.tourspot.entity.TourSpotReview;
 import com.positivewand.tourin.web.aop.PaginationAspect.PaginationHeader;
 import com.positivewand.tourin.web.tourspot.request.AddTourSpotReviewRequest;
 import com.positivewand.tourin.web.tourspot.request.PutTourSpotReviewLikeRequest;
@@ -21,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -30,7 +28,6 @@ public class TourSpotController {
     private final TourSpotService tourSpotService;
     private final TourSpotReviewService tourSpotReviewService;
     private final TourSpotReviewLikeService tourSpotReviewLikeService;
-    private final CustomUserDetailsService userDetailsService;
 
     @GetMapping("/tour-spots")
     @PaginationHeader
@@ -82,9 +79,6 @@ public class TourSpotController {
             @RequestParam(name = "maxLat") Double maxLat,
             @RequestParam(name = "maxLng") Double maxLng
     ) {
-        if (Haversine.calculateDistance(minLat, minLng, maxLat, maxLng) > 30) {
-            throw new IllegalArgumentException("대각선 길이가 30km 이하인 경우에만 지도에서 검색이 가능합니다.");
-        }
 
         List<TourSpotDto> tourSpots = null;
         if(query.isEmpty()) {
@@ -141,12 +135,11 @@ public class TourSpotController {
     @ResponseStatus(HttpStatus.OK)
     public void putTourSpotReviewLike(
             @PathVariable(name = "tourSpotReviewId") Long tourSpotReviewId,
-            @RequestBody PutTourSpotReviewLikeRequest putTourSpotReviewLikeRequest
+            @RequestBody PutTourSpotReviewLikeRequest putTourSpotReviewLikeRequest,
+            Principal principal
     ) {
-        CustomUserDetails userDetails = userDetailsService.getCurrentContextUser();
-
-        if(!userDetails.getUsername().equals(putTourSpotReviewLikeRequest.userId())) {
-            throw new AccessDeniedException("회원은 자신의 북마크만 삭제할 수 있습니다.");
+        if(!principal.getName().equals(putTourSpotReviewLikeRequest.userId())) {
+            throw new AccessDeniedException("회원은 자신의 좋아요만 추가/삭제할 수 있습니다.");
         }
 
         if(putTourSpotReviewLikeRequest.liked()) {

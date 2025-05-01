@@ -15,18 +15,19 @@ import java.util.UUID;
 @Component
 @Slf4j
 public class LogTraceInitFilter extends OncePerRequestFilter {
+    public final static ThreadLocal<String> requestIdHolder = new ThreadLocal<>();
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestId = UUID.randomUUID().toString();
         String jsessionId = getCookie(request.getCookies(), "JSESSIONID");
 
-        LogTraceAspect.requestIdHolder.set(requestId);
-        LogTraceAspect.jsessionIdHolder.set(jsessionId);
+        LogTraceInitFilter.requestIdHolder.set(requestId);
         try {
-            log.trace("[Request ID: {}, JSESSIONID: {}] 요청 수신", requestId, jsessionId);
+            log.trace("[Request ID: {}] 요청 수신, JSESSIONID: {}", requestId, jsessionId);
             filterChain.doFilter(request, response);
         } finally {
-            LogTraceAspect.requestIdHolder.remove();
+            LogTraceInitFilter.requestIdHolder.remove();
         }
     }
 

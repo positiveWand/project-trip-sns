@@ -59,6 +59,8 @@ public class TourSpotReviewLikeService {
             throw new NoSuchElementException("관광지 후기가 존재하지 않습니다.");
         }
 
+        tourSpotReview.get().incrementLikeCount();
+
         tourSpotReviewLikeRepository.save(TourSpotReviewLike.create(user.get(), tourSpotReview.get()));
     }
 
@@ -76,6 +78,17 @@ public class TourSpotReviewLikeService {
             throw new NoSuchElementException("관광지 후기가 존재하지 않습니다.");
         }
 
+        tourSpotReview.get().decrementLikeCount();
+
         tourSpotReviewLikeRepository.deleteById(TourSpotReviewLikeId.create(user.get().getId(), tourSpotReviewId));
+    }
+
+    @Transactional
+    public void syncTourSpotReviewLike(List<Long> tourSpotReviewKeys, Map<Long, Long> difference) {
+        List<TourSpotReview> tourSpotReviews = tourSpotReviewRepository.findForUpdateByIdIn(tourSpotReviewKeys);
+
+        for(TourSpotReview tourSpotReview: tourSpotReviews) {
+            tourSpotReview.setLikeCount(tourSpotReview.getLikeCount()+difference.get(tourSpotReview.getId()));
+        }
     }
 }
