@@ -30,7 +30,7 @@ public class TourSpotReview {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tour_spot_id")
     private TourSpot tourSpot;
     @OneToMany(mappedBy = "tourSpotReview")
