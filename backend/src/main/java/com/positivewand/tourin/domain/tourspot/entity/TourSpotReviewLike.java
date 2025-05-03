@@ -12,12 +12,12 @@ public class TourSpotReviewLike {
     @EmbeddedId
     private TourSpotReviewLikeId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("tourSpotReviewId")
     @JoinColumn(name = "tour_spot_review_id")
     private TourSpotReview tourSpotReview;

@@ -1,6 +1,5 @@
 package com.positivewand.tourin.domain.tourspot;
 
-import com.positivewand.tourin.domain.common.Ngram;
 import com.positivewand.tourin.domain.tourspot.dto.TourSpotDto;
 import com.positivewand.tourin.domain.tourspot.entity.TourSpot;
 import com.positivewand.tourin.domain.tourspot.entity.TourSpotCategory;
@@ -19,14 +18,11 @@ public class TourSpotService {
 
     private final TourSpotRepository tourSpotRepository;
 
-    public TourSpotDto findTourSpot(Long id) {
-        Optional<TourSpot> tourSpot = tourSpotRepository.findById(id);
+    public TourSpotDto findTourSpot(Long tourSpotId) {
+        TourSpot tourSpot = tourSpotRepository.findById(tourSpotId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 관광지입니다."));
 
-        if(tourSpot.isEmpty()) {
-            throw new NoSuchElementException("관광지가 없습니다.");
-        }
-
-        return TourSpotDto.create(tourSpot.get());
+        return TourSpotDto.create(tourSpot);
     }
 
     public Page<TourSpotDto> findTourSpots(

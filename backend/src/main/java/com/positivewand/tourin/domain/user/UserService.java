@@ -25,13 +25,10 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public UserDto findUser(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("등록된 회원이 없습니다."));
 
-        if(user.isEmpty()) {
-            throw new NoSuchElementException("등록된 회원이 없습니다.");
-        }
-
-        return UserDto.create(user.get());
+        return UserDto.create(user);
     }
 
     public Page<UserDto> findUsers(int page, int size) {
@@ -60,45 +57,36 @@ public class UserService {
 
     @Transactional
     public void updateUser(String username, String name, String email) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("등록된 회원이 없습니다."));
 
-        if(user.isEmpty()) {
-            throw new NoSuchElementException("등록된 회원이 없습니다.");
-        }
-
-        user.get().updateProfile(name, email);
-        userRepository.save(user.get());
+        user.updateProfile(name, email);
+        userRepository.save(user);
     }
 
     @Transactional
     public void changePassword(String username, String oldPassword, String newPassword) {
-        Optional<User> user = userRepository.findByUsername(username);
-
-        if(user.isEmpty()) {
-            throw new NoSuchElementException("등록된 회원이 없습니다.");
-        }
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("등록된 회원이 없습니다."));
         
-        if(!passwordEncoder.matches(oldPassword, user.get().getPassword())) {
+        if(!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new BadCredentialsException("기존 비밀번호가 일치하지 않습니다.");
         }
 
-        user.get().changePassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user.get());
+        user.changePassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 
     @Transactional
     public void deleteUser(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
-
-        if(user.isEmpty()) {
-            throw new NoSuchElementException("등록된 회원이 없습니다.");
-        }
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("등록된 회원이 없습니다."));
         
         // 회원 관련 데이터(관광지 후기 좋아요, 관광지 후기, 북마크)와 회원 삭제
-        tourSpotReviewLikeRepository.deleteByUserId(user.get().getId());
-        tourSpotReviewRepository.deleteByUser_Id(user.get().getId());
-        bookmarkRepository.deleteByUserId(user.get().getId());
+        tourSpotReviewLikeRepository.deleteByUserId(user.getId());
+        tourSpotReviewRepository.deleteByUser_Id(user.getId());
+        bookmarkRepository.deleteByUserId(user.getId());
 
-        userRepository.delete(user.get());
+        userRepository.delete(user);
     }
 }

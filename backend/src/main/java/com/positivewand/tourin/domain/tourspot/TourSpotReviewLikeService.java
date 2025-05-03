@@ -19,19 +19,13 @@ public class TourSpotReviewLikeService {
     private final TourSpotReviewLikeRepository tourSpotReviewLikeRepository;
 
     public boolean checkLike(String username, Long tourSpotReviewId) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("등록된 회원이 없습니다."));
 
-        if(user.isEmpty()) {
-            throw new NoSuchElementException("등록된 회원이 없습니다.");
-        }
+        tourSpotReviewRepository.findById(tourSpotReviewId)
+                .orElseThrow(() -> new NoSuchElementException("관광지 후기가 존재하지 않습니다."));
 
-        Optional<TourSpotReview> tourSpotReview = tourSpotReviewRepository.findById(tourSpotReviewId);
-
-        if(tourSpotReview.isEmpty()) {
-            throw new NoSuchElementException("관광지 후기가 존재하지 않습니다.");
-        }
-
-        Optional<TourSpotReviewLike> tourSpotReviewLike = tourSpotReviewLikeRepository.findById(TourSpotReviewLikeId.create(user.get().getId(), tourSpotReviewId));
+        Optional<TourSpotReviewLike> tourSpotReviewLike = tourSpotReviewLikeRepository.findById(TourSpotReviewLikeId.create(user.getId(), tourSpotReviewId));
         return tourSpotReviewLike.isPresent();
     }
 
@@ -47,40 +41,28 @@ public class TourSpotReviewLikeService {
 
     @Transactional
     public void addReviewLike(String username, Long tourSpotReviewId) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("등록된 회원이 없습니다."));
 
-        if(user.isEmpty()) {
-            throw new NoSuchElementException("등록된 회원이 없습니다.");
-        }
+        TourSpotReview tourSpotReview = tourSpotReviewRepository.findById(tourSpotReviewId)
+                .orElseThrow(() -> new NoSuchElementException("관광지 후기가 존재하지 않습니다."));
 
-        Optional<TourSpotReview> tourSpotReview = tourSpotReviewRepository.findById(tourSpotReviewId);
+        tourSpotReview.incrementLikeCount();
 
-        if(tourSpotReview.isEmpty()) {
-            throw new NoSuchElementException("관광지 후기가 존재하지 않습니다.");
-        }
-
-        tourSpotReview.get().incrementLikeCount();
-
-        tourSpotReviewLikeRepository.save(TourSpotReviewLike.create(user.get(), tourSpotReview.get()));
+        tourSpotReviewLikeRepository.save(TourSpotReviewLike.create(user, tourSpotReview));
     }
 
     @Transactional
     public void deleteReviewLike(String username, Long tourSpotReviewId) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("등록된 회원이 없습니다."));
 
-        if(user.isEmpty()) {
-            throw new NoSuchElementException("등록된 회원이 없습니다.");
-        }
+        TourSpotReview tourSpotReview = tourSpotReviewRepository.findById(tourSpotReviewId)
+                .orElseThrow(() -> new NoSuchElementException("관광지 후기가 존재하지 않습니다."));
 
-        Optional<TourSpotReview> tourSpotReview = tourSpotReviewRepository.findById(tourSpotReviewId);
+        tourSpotReview.decrementLikeCount();
 
-        if(tourSpotReview.isEmpty()) {
-            throw new NoSuchElementException("관광지 후기가 존재하지 않습니다.");
-        }
-
-        tourSpotReview.get().decrementLikeCount();
-
-        tourSpotReviewLikeRepository.deleteById(TourSpotReviewLikeId.create(user.get().getId(), tourSpotReviewId));
+        tourSpotReviewLikeRepository.deleteById(TourSpotReviewLikeId.create(user.getId(), tourSpotReviewId));
     }
 
     @Transactional

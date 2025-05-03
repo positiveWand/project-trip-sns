@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,21 +24,15 @@ public class TourSpotReviewService {
     private final TourSpotReviewLikeRepository tourSpotReviewLikeRepository;
 
     public TourSpotReviewDto findTourSpotReview(Long tourSpotReviewId) {
-        Optional<TourSpotReview> tourSpotReview = tourSpotReviewRepository.findById(tourSpotReviewId);
+        TourSpotReview tourSpotReview = tourSpotReviewRepository.findById(tourSpotReviewId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 관광지 후기입니다."));
 
-        if(tourSpotReview.isEmpty()) {
-            throw new NoSuchElementException("존재하지 않는 관광지 후기입니다.");
-        }
-
-        return TourSpotReviewDto.create(tourSpotReview.get());
+        return TourSpotReviewDto.create(tourSpotReview);
     }
 
     public Page<TourSpotReviewDto> findTourSpotReviews(Long tourSpotId, int page, int size) {
-        Optional<TourSpot> tourSpot = tourSpotRepository.findById(tourSpotId);
-
-        if(tourSpot.isEmpty()) {
-            throw new NoSuchElementException("존재하지 않는 관광지입니다.");
-        }
+        tourSpotRepository.findById(tourSpotId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 관광지입니다."));
 
         Page<TourSpotReview> tourSpotReviews = tourSpotReviewRepository.findByTourSpotId(
                 tourSpotId,
@@ -58,19 +51,13 @@ public class TourSpotReviewService {
 
     @Transactional
     public TourSpotReviewDto addTourSpotReview(Long tourSpotId, String username, String content) {
-        Optional<TourSpot> tourSpot = tourSpotRepository.findById(tourSpotId);
+        TourSpot tourSpot = tourSpotRepository.findById(tourSpotId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 관광지입니다."));
 
-        if(tourSpot.isEmpty()) {
-            throw new NoSuchElementException("존재하지 않는 관광지입니다.");
-        }
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("등록된 회원이 없습니다."));
 
-        Optional<User> user = userRepository.findByUsername(username);
-
-        if(user.isEmpty()) {
-            throw new NoSuchElementException("등록된 회원이 없습니다.");
-        }
-
-        TourSpotReview tourSpotReview = TourSpotReview.create(tourSpot.get(), user.get(), content, LocalDateTime.now(), 0L);
+        TourSpotReview tourSpotReview = TourSpotReview.create(tourSpot, user, content, LocalDateTime.now(), 0L);
 
         tourSpotReviewRepository.save(tourSpotReview);
 
@@ -79,11 +66,8 @@ public class TourSpotReviewService {
 
     @Transactional
     public void deleteTourSpotReview(Long tourSpotReviewId) {
-        Optional<TourSpotReview> tourSpotReview = tourSpotReviewRepository.findById(tourSpotReviewId);
-
-        if(tourSpotReview.isEmpty()) {
-            throw new NoSuchElementException("관광지 후기가 존재하지 않습니다.");
-        }
+        tourSpotReviewRepository.findById(tourSpotReviewId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 관광지 후기입니다."));
 
         tourSpotReviewLikeRepository.deleteByTourSpotReviewId(tourSpotReviewId);
         tourSpotReviewRepository.deleteById(tourSpotReviewId);
