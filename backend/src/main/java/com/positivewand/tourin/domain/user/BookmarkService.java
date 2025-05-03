@@ -2,7 +2,6 @@ package com.positivewand.tourin.domain.user;
 
 import com.positivewand.tourin.domain.tourspot.TourSpotRepository;
 import com.positivewand.tourin.domain.tourspot.entity.TourSpot;
-import com.positivewand.tourin.domain.user.UserRepository;
 import com.positivewand.tourin.domain.user.dto.BookmarkDto;
 import com.positivewand.tourin.domain.user.entity.Bookmark;
 import com.positivewand.tourin.domain.user.entity.BookmarkId;
@@ -23,60 +22,42 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
 
     public Page<BookmarkDto> findBookmarks(String username, int page, int size) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("등록된 회원이 없습니다."));
 
-        if(user.isEmpty()) {
-            throw new NoSuchElementException("등록된 회원이 없습니다.");
-        }
-
-        Page<Bookmark> bookmarks = bookmarkRepository.findByUserId(user.get().getId(), PageRequest.of(page, size));
+        Page<Bookmark> bookmarks = bookmarkRepository.findByUserId(user.getId(), PageRequest.of(page, size));
 
         return bookmarks.map(BookmarkDto::create);
     }
 
     public BookmarkDto findBookmark(String username, Long tourSpotId) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("등록된 회원이 없습니다."));
 
-        if(user.isEmpty()) {
-            throw new NoSuchElementException("등록된 회원이 없습니다.");
-        }
+        Bookmark bookmark = bookmarkRepository.findById(BookmarkId.create(user.getId(), tourSpotId))
+                .orElseThrow(() -> new NoSuchElementException("관광지가 북마크에 존재하지 않습니다."));
 
-        Optional<Bookmark> bookmark = bookmarkRepository.findById(BookmarkId.create(user.get().getId(), tourSpotId));
-
-        if(bookmark.isEmpty()) {
-            throw new NoSuchElementException("관광지가 북마크에 존재하지 않습니다.");
-        }
-
-        return BookmarkDto.create(bookmark.get());
+        return BookmarkDto.create(bookmark);
     }
 
     @Transactional
     public void addBookmark(String username, Long tourSpotId) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("등록된 회원이 없습니다."));
 
-        if(user.isEmpty()) {
-            throw new NoSuchElementException("등록된 회원이 없습니다.");
-        }
+        TourSpot tourSpot = tourSpotRepository.findById(tourSpotId)
+                .orElseThrow(() -> new NoSuchElementException("등록된 관광지가 없습니다."));
 
-        Optional<TourSpot> tourSpot = tourSpotRepository.findById(tourSpotId);
-
-        if(tourSpot.isEmpty()) {
-            throw new NoSuchElementException("등록된 관광지가 없습니다.");
-        }
-
-        Bookmark bookmark = Bookmark.create(user.get(), tourSpot.get());
+        Bookmark bookmark = Bookmark.create(user, tourSpot);
         bookmarkRepository.save(bookmark);
     }
 
     @Transactional
     public void deleteBookmark(String username, Long tourSpotId) {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("등록된 회원이 없습니다."));
 
-        if(user.isEmpty()) {
-            throw new NoSuchElementException("등록된 회원이 없습니다.");
-        }
-
-        Optional<Bookmark> bookmark = bookmarkRepository.findById(BookmarkId.create(user.get().getId(), tourSpotId));
+        Optional<Bookmark> bookmark = bookmarkRepository.findById(BookmarkId.create(user.getId(), tourSpotId));
 
         bookmark.ifPresent(bookmarkRepository::delete);
     }
