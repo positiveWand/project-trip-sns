@@ -12,6 +12,7 @@ import java.util.Collection;
 @Builder
 @AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
+    private Long userId;
     private String username;
     private String password;
     private String name;
@@ -20,6 +21,7 @@ public class CustomUserDetails implements UserDetails {
 
     public static CustomUserDetails createFromUser(User user) {
         return CustomUserDetails.builder()
+                .userId(user.getId())
                 .username(user.getUsername())
                 .password(user.getPassword())
                 .name(user.getName())
@@ -43,6 +45,10 @@ public class CustomUserDetails implements UserDetails {
         return this.username;
     }
 
+    public Long getUserId() {
+        return this.userId;
+    }
+
     public String getName() {
         return this.name;
     }
@@ -54,6 +60,7 @@ public class CustomUserDetails implements UserDetails {
     public void setName(String name) {
         this.name = name;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -61,7 +68,8 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String toString() {
         return "CustomUserDetails{" +
-                "username='" + username + '\'' +
+                "userId=" + userId +
+                ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
