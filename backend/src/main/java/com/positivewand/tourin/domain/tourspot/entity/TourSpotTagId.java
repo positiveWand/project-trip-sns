@@ -14,6 +14,15 @@ public class TourSpotTagId implements Serializable {
     @Enumerated(EnumType.STRING)
     private TourSpotCategory tag;
 
+    public static TourSpotTagId create(long tourSpotId, TourSpotCategory tag) {
+        TourSpotTagId newId = new TourSpotTagId();
+
+        newId.tourSpotId = tourSpotId;
+        newId.tag = tag;
+
+        return newId;
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this == other) return true;
