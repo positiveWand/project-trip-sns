@@ -105,6 +105,7 @@ public class TourSpotController {
     }
 
     @GetMapping("/tour-spots/{tourSpotId}/reviews")
+    @PaginationHeader
     public Page<TourSpotReviewResponse> getTourSpotReviews(
             @PathVariable(name = "tourSpotId") Long tourSpotId,
             @RequestParam(name = "pageNo", defaultValue = "1") int pageNo,
@@ -135,17 +136,17 @@ public class TourSpotController {
     @ResponseStatus(HttpStatus.OK)
     public void putTourSpotReviewLike(
             @PathVariable(name = "tourSpotReviewId") Long tourSpotReviewId,
-            @RequestBody PutTourSpotReviewLikeRequest putTourSpotReviewLikeRequest,
+            @RequestBody PutTourSpotReviewLikeRequest request,
             Principal principal
     ) {
-        if(!principal.getName().equals(putTourSpotReviewLikeRequest.userId())) {
+        if(!principal.getName().equals(request.userId())) {
             throw new AccessDeniedException("회원은 자신의 좋아요만 추가/삭제할 수 있습니다.");
         }
 
-        if(putTourSpotReviewLikeRequest.liked()) {
-            tourSpotReviewLikeService.addReviewLike(putTourSpotReviewLikeRequest.userId(), tourSpotReviewId);
+        if(request.liked()) {
+            tourSpotReviewLikeService.addReviewLike(request.userId(), tourSpotReviewId);
         } else {
-            tourSpotReviewLikeService.deleteReviewLike(putTourSpotReviewLikeRequest.userId(), tourSpotReviewId);
+            tourSpotReviewLikeService.deleteReviewLike(request.userId(), tourSpotReviewId);
         }
     }
 }
