@@ -46,7 +46,7 @@ public interface TourSpotRepository extends JpaRepository<TourSpot, Long> {
             WHERE (tag.tag IN (:tags))
         """,
         countQuery = """
-            SELECT COUNT(DISTINCT *)
+            SELECT COUNT(DISTINCT filtered_ts.id)
             FROM (SELECT ts.* FROM tour_spot ts WHERE MATCH(ts.name) AGAINST(:query IN BOOLEAN MODE)) filtered_ts
             LEFT JOIN tour_spot_tag tag ON filtered_ts.id = tag.tour_spot_id
             WHERE (tag.tag IN (:tags))
@@ -77,7 +77,7 @@ public interface TourSpotRepository extends JpaRepository<TourSpot, Long> {
             WHERE (tag.tag IN (:tags))
         """,
         countQuery = """
-            SELECT COUNT(DISTINCT *)
+            SELECT COUNT(DISTINCT filtered_ts.id)
             FROM (SELECT ts.* FROM tour_spot ts) filtered_ts
             LEFT JOIN tour_spot_tag tag ON filtered_ts.id = tag.tour_spot_id
             WHERE (tag.tag IN (:tags))
@@ -143,7 +143,7 @@ public interface TourSpotRepository extends JpaRepository<TourSpot, Long> {
             WHERE (tag.tag IN (:tags))
         """,
         countQuery = """
-            SELECT COUNT(DISTINCT *)
+            SELECT COUNT(DISTINCT filtered_ts.id)
             FROM (
                 SELECT ts.* FROM tour_spot ts
                 WHERE (MATCH(ts.name) AGAINST(:query IN BOOLEAN MODE))
@@ -191,7 +191,7 @@ public interface TourSpotRepository extends JpaRepository<TourSpot, Long> {
             WHERE (tag.tag IN (:tags))
         """,
         countQuery = """
-            SELECT COUNT(DISTINCT *)
+            SELECT COUNT(DISTINCT filtered_ts.id)
             FROM (
                 SELECT ts.* FROM tour_spot ts
                 WHERE (ts.lat >= :minLat)
