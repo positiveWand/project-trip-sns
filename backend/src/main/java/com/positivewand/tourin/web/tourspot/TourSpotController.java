@@ -120,15 +120,29 @@ public class TourSpotController {
     @ResponseStatus(HttpStatus.CREATED)
     public TourSpotReviewResponse addTourSpotReview(
             @PathVariable(name = "tourSpotId") Long tourSpotId,
-            @RequestBody AddTourSpotReviewRequest request
+            @RequestBody AddTourSpotReviewRequest request,
+            Principal principal
     ) {
+        if(!principal.getName().equals(request.userId())) {
+            throw new AccessDeniedException("회원은 자신의 관광지 후기만 추가할 수 있습니다.");
+        }
+
         TourSpotReviewDto tourSpotReview = tourSpotReviewService.addTourSpotReview(tourSpotId, request.userId(), request.content());
         return TourSpotReviewResponse.createFromDto(tourSpotReview);
     }
 
     @DeleteMapping("/tour-spot-reviews/{tourSpotReviewId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteTourSpotReview(@PathVariable(name = "tourSpotReviewId") Long tourSpotReviewId) {
+    public void deleteTourSpotReview(
+            @PathVariable(name = "tourSpotReviewId") Long tourSpotReviewId,
+            Principal principal
+    ) {
+        TourSpotReviewDto tourSpotReview = tourSpotReviewService.findTourSpotReview(tourSpotReviewId);
+
+        if(!principal.getName().equals(tourSpotReview.username())) {
+            throw new AccessDeniedException("회원은 자신의 관광지 후기만 삭제할 수 있습니다.");
+        }
+
         tourSpotReviewService.deleteTourSpotReview(tourSpotReviewId);
     }
 
