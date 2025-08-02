@@ -415,8 +415,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        "401":
-          description: 북마크 조회에 실패했습니다. 조회를 위해서는 인증이 필요합니다.
+        "404":
+          description: 북마크 조회에 실패했습니다. 회원 ID(userId)에 해당하는 회원이 존재하지 않습니다.
           content:
             application/json:
               schema:
@@ -484,7 +484,7 @@ paths:
         required: true
         schema:
           type: string
-        description: 삭제하려는 관광지 ID
+        description: 조회 또는 삭제하려는 관광지 ID
     get:
       tags:
         - 회원
