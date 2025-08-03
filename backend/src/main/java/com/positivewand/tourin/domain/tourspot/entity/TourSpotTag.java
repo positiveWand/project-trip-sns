@@ -17,4 +17,14 @@ public class TourSpotTag {
     @Column(name = "tag", insertable = false, updatable = false)
     @Enumerated(EnumType.STRING)
     private TourSpotCategory tag;
+
+    public static TourSpotTag create(TourSpot tourSpot, TourSpotCategory tag) {
+        TourSpotTag newTag = new TourSpotTag();
+
+        newTag.tourSpot = tourSpot;
+        newTag.id = TourSpotTagId.create(tourSpot.getId(), tag);
+        newTag.tag = tag;
+
+        return newTag;
+    }
 }

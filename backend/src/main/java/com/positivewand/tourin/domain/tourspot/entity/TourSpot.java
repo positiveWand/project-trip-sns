@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -38,7 +39,48 @@ public class TourSpot {
     @Column(name = "lng")
     private Double lng;
 
-    @OneToMany(mappedBy = "tourSpot")
+    @OneToMany(mappedBy = "tourSpot", cascade = CascadeType.ALL)
     @BatchSize(size = 50)
-    private List<TourSpotTag> tags;
+    private List<TourSpotTag> tags = new ArrayList<>();
+
+    public static TourSpot create(
+            long id,
+            String name,
+            String description,
+            String imageUrl,
+            String fullAddress,
+            String address1,
+            String address2,
+            int provinceCode,
+            int districtCode,
+            double lat,
+            double lng,
+            List<TourSpotCategory> tags
+    ) {
+        TourSpot newTourSpot = new TourSpot();
+
+        newTourSpot.id = id;
+        newTourSpot.name = name;
+        newTourSpot.description = description;
+        newTourSpot.imageUrl = imageUrl;
+        newTourSpot.fullAddress = fullAddress;
+        newTourSpot.address1 = address1;
+        newTourSpot.address2 = address2;
+        newTourSpot.provinceCode = provinceCode;
+        newTourSpot.districtCode = districtCode;
+        newTourSpot.lat = lat;
+        newTourSpot.lng = lng;
+        newTourSpot.tags = new ArrayList<>();
+
+        for (TourSpotCategory tag: tags) {
+            newTourSpot.addTag(tag);
+        }
+
+        return newTourSpot;
+    }
+
+    public void addTag(TourSpotCategory tag) {
+        TourSpotTag newTag = TourSpotTag.create(this, tag);
+        this.tags.add(newTag);
+    }
 }
