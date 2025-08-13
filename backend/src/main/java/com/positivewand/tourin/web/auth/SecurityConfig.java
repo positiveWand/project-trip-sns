@@ -1,5 +1,6 @@
 package com.positivewand.tourin.web.auth;
 
+import com.positivewand.tourin.domain.auth.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -61,6 +62,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                         .authenticationEntryPoint(authenticationEntryPoint)
                 )
+                .anonymous(anonymous -> anonymous.principal(CustomUserDetails.createAnonymousUser()))
                 .sessionManagement(session -> session.sessionCreationPolicy((SessionCreationPolicy.IF_REQUIRED)));
 
         return http.build();

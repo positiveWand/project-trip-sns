@@ -30,6 +30,12 @@ public class CustomUserDetails implements UserDetails {
                 .build();
     }
 
+    public static CustomUserDetails createAnonymousUser() {
+        return CustomUserDetails.builder()
+                .username("anonymous")
+                .build();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.authorities;
