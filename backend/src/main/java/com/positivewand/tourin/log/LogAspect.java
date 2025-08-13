@@ -1,4 +1,4 @@
-package com.positivewand.tourin.web.aop;
+package com.positivewand.tourin.log;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
