@@ -1,7 +1,6 @@
-package com.positivewand.tourin.web.auth;
+package com.positivewand.tourin.web.security;
 
 import com.positivewand.tourin.domain.auth.CustomUserDetails;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +16,6 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -40,8 +38,7 @@ public class SecurityConfig {
             HttpSecurity http,
             AccessDeniedHandler accessDeniedHandler,
             AuthenticationEntryPoint authenticationEntryPoint,
-            SecurityContextRepository securityContextRepository,
-            UrlBasedCorsConfigurationSource corsConfigurationSource
+            SecurityContextRepository securityContextRepository
     ) throws Exception {
 
         http    .csrf(csrf -> csrf.disable())
