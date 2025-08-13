@@ -1,6 +1,7 @@
 package com.positivewand.tourin.web.aop;
 
 import com.positivewand.tourin.web.exception.RedirectException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 
 import java.util.NoSuchElementException;
 
+@Slf4j
 @RestControllerAdvice
 public class ControllerExceptionAdvice {
     // Spring Security 예외 처리
@@ -62,6 +64,7 @@ public class ControllerExceptionAdvice {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleUnknownException(Throwable e) {
         return new ResponseEntity<>(new ErrorResponse("알 수 없는 서버 오류", "서버에서 알 수 없는 이유로 요청 처리에 실패했습니다."), HttpStatus.INTERNAL_SERVER_ERROR);
+        log.error("{}", e.getMessage(), e);
     }
 
 

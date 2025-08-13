@@ -14,8 +14,10 @@ import com.positivewand.tourin.web.user.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -80,8 +82,13 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public void addUserBookmark(
             @PathVariable(name = "userId") String userId,
-            @RequestBody AddBookmarkRequest addBookmarkRequest
+            @RequestBody AddBookmarkRequest addBookmarkRequest,
+            Principal principal
     ) {
+        if(!principal.getName().equals(userId)) {
+            throw new AccessDeniedException("회원은 자신의 북마크만 변경할 수 있습니다.");
+        }
+
         bookmarkService.addBookmark(userId, addBookmarkRequest.tourSpotId());
     }
 
@@ -89,8 +96,13 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUserBookmark(
             @PathVariable(name = "userId") String userId,
-            @PathVariable(name = "tourSpotId") Long tourSpotId
+            @PathVariable(name = "tourSpotId") Long tourSpotId,
+            Principal principal
     ) {
+        if(!principal.getName().equals(userId)) {
+            throw new AccessDeniedException("회원은 자신의 북마크만 변경할 수 있습니다.");
+        }
+        
         bookmarkService.deleteBookmark(userId, tourSpotId);
     }
 

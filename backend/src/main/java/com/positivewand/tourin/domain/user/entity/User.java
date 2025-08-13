@@ -33,6 +33,10 @@ public class User {
     }
 
     private void setUsername(String username) {
+        if (username.equals("anonymous")) {
+            throw new IllegalArgumentException("허용되지 않은 사용자명입니다.");
+        }
+
         this.username = username;
     }
     private void setPassword(String password) {

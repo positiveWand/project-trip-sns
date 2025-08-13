@@ -3,6 +3,7 @@ package com.positivewand.tourin.domain.auth;
 import com.positivewand.tourin.domain.user.UserRepository;
 import com.positivewand.tourin.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
@@ -30,6 +31,10 @@ public class CustomUserDetailsService  implements UserDetailsService {
     public CustomUserDetails getCurrentContextUser() {
         SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
         SecurityContext context = securityContextHolderStrategy.getContext();
-        return (CustomUserDetails) context.getAuthentication().getPrincipal();
+        Authentication auth = context.getAuthentication();
+        if(auth == null)
+            return null;
+
+        return (CustomUserDetails) auth.getPrincipal();
     }
 }
