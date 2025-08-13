@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+    <variable scope="local" name="rootLevel" value="INFO"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%kvp- %X{traceId} %X{user} %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="${rootLevel}">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
