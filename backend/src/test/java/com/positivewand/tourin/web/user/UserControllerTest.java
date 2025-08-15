@@ -220,7 +220,18 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new AddBookmarkRequest(1000000001L)))
                 )
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.userId").exists())
+                .andExpect(jsonPath("$.tourSpotId").exists())
+                .andExpect(jsonPath("$.tourSpotOverview").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.name").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.address").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.lat").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.lng").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.imageUrl").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.description").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.phoneNumber").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.tags").exists());
     }
 
     @Test
@@ -240,7 +251,18 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new AddBookmarkRequest(1000000001L)))
                 )
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.userId").exists())
+                .andExpect(jsonPath("$.tourSpotId").exists())
+                .andExpect(jsonPath("$.tourSpotOverview").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.name").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.address").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.lat").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.lng").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.imageUrl").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.description").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.phoneNumber").exists())
+                .andExpect(jsonPath("$.tourSpotOverview.tags").exists());
     }
 
     @Test

@@ -41,7 +41,7 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void addBookmark(String username, Long tourSpotId) {
+    public BookmarkDto addBookmark(String username, Long tourSpotId) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException("등록된 회원이 없습니다."));
 
@@ -50,6 +50,8 @@ public class BookmarkService {
 
         Bookmark bookmark = Bookmark.create(user, tourSpot);
         bookmarkRepository.save(bookmark);
+
+        return BookmarkDto.create(bookmark);
     }
 
     @Transactional

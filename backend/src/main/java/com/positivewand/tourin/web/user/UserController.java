@@ -80,7 +80,7 @@ public class UserController {
 
     @PostMapping("/users/{userId}/bookmarks")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addUserBookmark(
+    public BookmarkResponse addUserBookmark(
             @PathVariable(name = "userId") String userId,
             @RequestBody AddBookmarkRequest addBookmarkRequest,
             Principal principal
@@ -89,7 +89,9 @@ public class UserController {
             throw new AccessDeniedException("회원은 자신의 북마크만 변경할 수 있습니다.");
         }
 
-        bookmarkService.addBookmark(userId, addBookmarkRequest.tourSpotId());
+        BookmarkDto bookmark = bookmarkService.addBookmark(userId, addBookmarkRequest.tourSpotId());
+
+        return BookmarkResponse.createFromDto(bookmark);
     }
 
     @DeleteMapping("/users/{userId}/bookmarks/{tourSpotId}")
