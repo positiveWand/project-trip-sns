@@ -1017,6 +1017,7 @@ paths:
           type: string
           enum:
             - main
+            - trend
     get:
       tags:
         - 추천

@@ -1,5 +1,6 @@
 package com.positivewand.tourin.web.tourspot;
 
+import com.positivewand.tourin.domain.auth.CustomUserDetailsService;
 import com.positivewand.tourin.domain.tourspot.TourSpotReviewLikeService;
 import com.positivewand.tourin.domain.tourspot.TourSpotReviewService;
 import com.positivewand.tourin.domain.tourspot.TourSpotService;
@@ -18,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -28,6 +28,7 @@ public class TourSpotController {
     private final TourSpotService tourSpotService;
     private final TourSpotReviewService tourSpotReviewService;
     private final TourSpotReviewLikeService tourSpotReviewLikeService;
+    private final CustomUserDetailsService userDetailsService;
 
     @GetMapping("/tour-spots")
     @PaginationHeader
@@ -120,10 +121,9 @@ public class TourSpotController {
     @ResponseStatus(HttpStatus.CREATED)
     public TourSpotReviewResponse addTourSpotReview(
             @PathVariable(name = "tourSpotId") Long tourSpotId,
-            @RequestBody AddTourSpotReviewRequest request,
-            Principal principal
+            @RequestBody AddTourSpotReviewRequest request
     ) {
-        if(!principal.getName().equals(request.userId())) {
+        if(!userDetailsService.getCurrentContextUser().getUsername().equals(request.userId())) {
             throw new AccessDeniedException("회원은 자신의 관광지 후기만 추가할 수 있습니다.");
         }
 
@@ -134,12 +134,11 @@ public class TourSpotController {
     @DeleteMapping("/tour-spot-reviews/{tourSpotReviewId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTourSpotReview(
-            @PathVariable(name = "tourSpotReviewId") Long tourSpotReviewId,
-            Principal principal
+            @PathVariable(name = "tourSpotReviewId") Long tourSpotReviewId
     ) {
         TourSpotReviewDto tourSpotReview = tourSpotReviewService.findTourSpotReview(tourSpotReviewId);
 
-        if(!principal.getName().equals(tourSpotReview.username())) {
+        if(!userDetailsService.getCurrentContextUser().getUsername().equals(tourSpotReview.username())) {
             throw new AccessDeniedException("회원은 자신의 관광지 후기만 삭제할 수 있습니다.");
         }
 
@@ -150,10 +149,9 @@ public class TourSpotController {
     @ResponseStatus(HttpStatus.OK)
     public void putTourSpotReviewLike(
             @PathVariable(name = "tourSpotReviewId") Long tourSpotReviewId,
-            @RequestBody PutTourSpotReviewLikeRequest request,
-            Principal principal
+            @RequestBody PutTourSpotReviewLikeRequest request
     ) {
-        if(!principal.getName().equals(request.userId())) {
+        if(!userDetailsService.getCurrentContextUser().getUsername().equals(request.userId())) {
             throw new AccessDeniedException("회원은 자신의 좋아요만 추가/삭제할 수 있습니다.");
         }
 
