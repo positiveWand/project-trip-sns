@@ -17,8 +17,15 @@ public class RecommendationController {
     private final RecommendationService recommendationService;
 
     @GetMapping("/recommendations/test")
-    public List<TourSpotOverviewResponse> getRecommendation() {
+    public List<TourSpotOverviewResponse> getTestRecommendation() {
         List<TourSpotDto> recommendation = recommendationService.getTestRecommendation("");
+
+        return recommendation.stream().map(TourSpotOverviewResponse::createFromTourSpotDto).toList();
+    }
+
+    @GetMapping("/recommendations/trend")
+    public List<TourSpotOverviewResponse> getTrendRecommendation() {
+        List<TourSpotDto> recommendation = recommendationService.getTrendRecommendation();
 
         return recommendation.stream().map(TourSpotOverviewResponse::createFromTourSpotDto).toList();
     }
