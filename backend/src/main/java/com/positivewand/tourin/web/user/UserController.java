@@ -17,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -82,10 +81,9 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public BookmarkResponse addUserBookmark(
             @PathVariable(name = "userId") String userId,
-            @RequestBody AddBookmarkRequest addBookmarkRequest,
-            Principal principal
+            @RequestBody AddBookmarkRequest addBookmarkRequest
     ) {
-        if(!principal.getName().equals(userId)) {
+        if(!userDetailsService.getCurrentContextUser().getUsername().equals(userId)) {
             throw new AccessDeniedException("회원은 자신의 북마크만 변경할 수 있습니다.");
         }
 
@@ -98,10 +96,9 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUserBookmark(
             @PathVariable(name = "userId") String userId,
-            @PathVariable(name = "tourSpotId") Long tourSpotId,
-            Principal principal
+            @PathVariable(name = "tourSpotId") Long tourSpotId
     ) {
-        if(!principal.getName().equals(userId)) {
+        if(!userDetailsService.getCurrentContextUser().getUsername().equals(userId)) {
             throw new AccessDeniedException("회원은 자신의 북마크만 변경할 수 있습니다.");
         }
         

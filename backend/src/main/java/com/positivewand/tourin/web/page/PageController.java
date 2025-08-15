@@ -1,6 +1,6 @@
 package com.positivewand.tourin.web.page;
 
-import com.positivewand.tourin.domain.auth.CustomUserDetails;
+import com.positivewand.tourin.domain.auth.CustomUserDetailsService;
 import com.positivewand.tourin.web.exception.RedirectException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -8,15 +8,14 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @RequiredArgsConstructor
 public class PageController {
+    private final CustomUserDetailsService userDetailsService;
+
     @GetMapping({"/my"})
     public ResponseEntity<Resource> serveMyPage() {
         Resource resource = new ClassPathResource("static/my/index.html");
@@ -49,9 +48,7 @@ public class PageController {
     @GetMapping({"/social", "/social/**"})
     public ResponseEntity<Resource> serveSocialPage(HttpServletRequest request) {
         if(request.getRequestURI().equals("/social")) {
-            SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
-            SecurityContext context = securityContextHolderStrategy.getContext();
-            String username = ((CustomUserDetails) context.getAuthentication().getPrincipal()).getUsername();
+            String username = userDetailsService.getCurrentContextUser().getUsername();
             throw new RedirectException("/social/user/"+username);
         }
 
