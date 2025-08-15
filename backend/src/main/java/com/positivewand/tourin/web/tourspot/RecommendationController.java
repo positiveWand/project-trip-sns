@@ -1,6 +1,6 @@
 package com.positivewand.tourin.web.tourspot;
 
-import com.positivewand.tourin.domain.tourspot.RecommendationService;
+import com.positivewand.tourin.domain.recommendation.RecommendationService;
 import com.positivewand.tourin.domain.tourspot.dto.TourSpotDto;
 import com.positivewand.tourin.web.tourspot.response.TourSpotOverviewResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +16,9 @@ import java.util.List;
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
-    @GetMapping("/recommendations/main")
+    @GetMapping("/recommendations/test")
     public List<TourSpotOverviewResponse> getRecommendation() {
-        List<TourSpotDto> recommendation = recommendationService.getUserRecommendation("");
+        List<TourSpotDto> recommendation = recommendationService.getTestRecommendation("");
 
         return recommendation.stream().map(TourSpotOverviewResponse::createFromTourSpotDto).toList();
     }

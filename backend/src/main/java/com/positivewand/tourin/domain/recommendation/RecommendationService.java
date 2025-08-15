@@ -1,5 +1,6 @@
-package com.positivewand.tourin.domain.tourspot;
+package com.positivewand.tourin.domain.recommendation;
 
+import com.positivewand.tourin.domain.tourspot.TourSpotRepository;
 import com.positivewand.tourin.domain.tourspot.dto.TourSpotDto;
 import com.positivewand.tourin.domain.tourspot.entity.TourSpot;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,7 @@ import java.util.List;
 public class RecommendationService {
     private final TourSpotRepository tourSpotRepository;
 
-    public List<TourSpotDto> getUserRecommendation(String username) {
+    public List<TourSpotDto> getTestRecommendation(String username) {
         List<TourSpot> tourSpots = tourSpotRepository.findAllById(Arrays.asList(
                 126436L,
                 126438L,
