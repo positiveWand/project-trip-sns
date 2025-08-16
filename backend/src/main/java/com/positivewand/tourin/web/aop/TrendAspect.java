@@ -1,6 +1,8 @@
 package com.positivewand.tourin.web.aop;
 
 import com.positivewand.tourin.domain.recommendation.TrendService;
+import com.positivewand.tourin.infrastructure.ratelimit.RateLimiter;
+import com.positivewand.tourin.web.common.ClientIdResolver;
 import com.positivewand.tourin.web.tourspot.response.TourSpotResponse;
 import com.positivewand.tourin.web.user.response.BookmarkResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TrendAspect {
     private final TrendService trendService;
+    private final ClientIdResolver clientIdResolver;
+    private final RateLimiter rateLimiter;
+
     public static final int VISIT_SCORE = 1;
     public static final int BOOKMARK_SCORE = 2;
 
@@ -23,7 +28,9 @@ public class TrendAspect {
     )
     public void collectVisitTrend(JoinPoint join, TourSpotResponse returnVal) throws Throwable {
         long visitedTourSpotId = Long.valueOf(((TourSpotResponse) returnVal).id());
-        trendService.incrementTrendScore(visitedTourSpotId, VISIT_SCORE);
+
+        if (rateLimiter.tryConsume(getRateLimitKey(clientIdResolver.resolve(), visitedTourSpotId), 1))
+            trendService.incrementTrendScore(visitedTourSpotId, VISIT_SCORE);
     }
 
     @AfterReturning(
@@ -32,6 +39,12 @@ public class TrendAspect {
     )
     public void collectBookmarkTrend(JoinPoint join, BookmarkResponse returnVal) throws Throwable {
         long bookmarkedTourSpotId = Long.valueOf(((BookmarkResponse) returnVal).tourSpotId());
-        trendService.incrementTrendScore(bookmarkedTourSpotId, BOOKMARK_SCORE);
+
+        if (rateLimiter.tryConsume(getRateLimitKey(clientIdResolver.resolve(), bookmarkedTourSpotId), 1))
+            trendService.incrementTrendScore(bookmarkedTourSpotId, BOOKMARK_SCORE);
+    }
+
+    private String getRateLimitKey(String clientId, long tourSpotId) {
+        return clientId + ":" + tourSpotId;
     }
 }
