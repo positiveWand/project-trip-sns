@@ -7,6 +7,8 @@ import com.positivewand.tourin.domain.tourspot.TourSpotService;
 import com.positivewand.tourin.domain.tourspot.dto.TourSpotDto;
 import com.positivewand.tourin.domain.user.BookmarkService;
 import com.positivewand.tourin.domain.user.dto.BookmarkDto;
+import com.positivewand.tourin.infrastructure.ratelimit.RateLimiter;
+import com.positivewand.tourin.web.common.ClientIdResolver;
 import com.positivewand.tourin.web.tourspot.TourSpotController;
 import com.positivewand.tourin.web.user.UserController;
 import com.positivewand.tourin.web.user.request.AddBookmarkRequest;
@@ -38,6 +40,10 @@ class TrendAspectTest {
     BookmarkService bookmarkService;
     @MockitoBean
     TourSpotService tourSpotService;
+    @MockitoBean
+    RateLimiter rateLimiter;
+    @MockitoBean
+    ClientIdResolver clientIdResolver;
 
     @Test
     void AOP를_활용해_트렌드_정보를_정확히_수집한다() throws Exception {
@@ -83,6 +89,12 @@ class TrendAspectTest {
             collected.put(tourSpotId, collected.get(tourSpotId) + delta);
             return null;
         }).when(trendService).incrementTrendScore(anyLong(), anyInt());
+
+        // RateLimiter 모킹, rate limit 없도록 항상 true 반환
+        when(rateLimiter.tryConsume(anyString(), anyInt())).thenAnswer(invocation -> true);
+
+        // ClientIdResolver 모킹
+        when(clientIdResolver.resolve()).thenAnswer(invocation -> "testuser");
 
         // 20번의 무작위 테스트 세션을 통과해야한다
         // 세션마다 트렌드 점수에 반영이 되는 경우(요청 정상 처리)와 안되는 경우(처리 중 예외 발생)가 섞여 있다
