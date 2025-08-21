@@ -63,8 +63,8 @@ public class ControllerExceptionAdvice {
     // 그 외 예외 처리
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleUnknownException(Throwable e) {
-        return new ResponseEntity<>(new ErrorResponse("알 수 없는 서버 오류", "서버에서 알 수 없는 이유로 요청 처리에 실패했습니다."), HttpStatus.INTERNAL_SERVER_ERROR);
         log.error("{}", e.getMessage(), e);
+        return new ResponseEntity<>(new ErrorResponse("알 수 없는 서버 오류", "서버에서 알 수 없는 이유로 요청 처리에 실패했습니다."), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
