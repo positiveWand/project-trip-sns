@@ -109,10 +109,11 @@ class RecommendationControllerTest {
         }
 
         // given - 트렌드 점수 저장소에 관광지 저장
-        trendService.resetTrendScore();
+        trendService.resetTrend();
         for (int id = 1000000000; id < 1000000010; id++) {
             trendService.incrementTrendScore(id, 1);
         }
+        trendService.slideTrendTopkWindow();
 
         mockMvc.perform(get("/api/recommendations/trend")
                         .with(testUser("userfortestA"))
