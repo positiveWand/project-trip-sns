@@ -1,12 +1,13 @@
 package com.positivewand.tourin.infrastructure.ratelimit;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Component;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
@@ -23,6 +24,15 @@ public class TrendRateLimiter implements RateLimiter {
                         LocalDate.now().plusDays(1).atStartOfDay()
                 )
         ));
+    }
+
+    public void clear() {
+        ScanOptions options = ScanOptions.scanOptions().match("ratelimit:trend:*").build();
+        try (Cursor<String> cursor = rateLimiterOps.scan(options)) {
+            while (cursor.hasNext()) {
+                rateLimiterOps.delete(cursor.next());
+            }
+        }
     }
 
     private String getBucketKey(String key) {

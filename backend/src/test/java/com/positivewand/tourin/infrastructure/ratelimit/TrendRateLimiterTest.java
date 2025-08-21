@@ -13,6 +13,7 @@ class TrendRateLimiterTest {
 
     @Test
     void 하루에_최대_한번_컨슘한다() {
+        trendRateLimiter.clear();
         assertTrue(trendRateLimiter.tryConsume("test", 1));
         for (int i = 0; i < 5; i++) {
             assertFalse(trendRateLimiter.tryConsume("test", 1));
