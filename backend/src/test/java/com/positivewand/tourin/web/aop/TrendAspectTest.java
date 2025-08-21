@@ -82,13 +82,13 @@ class TrendAspectTest {
         // 테스트 관심사는 TrendAspect이기 때문에 그것이 의존하는 TrendService도 모킹
         doAnswer(invocation -> {
             long tourSpotId = invocation.getArgument(0, Long.class);
-            int delta = invocation.getArgument(1, Integer.class);
+            double delta = invocation.getArgument(1, Double.class);
 
             if (!collected.containsKey(tourSpotId))
                 collected.put(tourSpotId, 0L);
-            collected.put(tourSpotId, collected.get(tourSpotId) + delta);
+            collected.put(tourSpotId, collected.get(tourSpotId) + (long) delta);
             return null;
-        }).when(trendService).incrementTrendScore(anyLong(), anyInt());
+        }).when(trendService).incrementTrendScore(anyLong(), anyDouble());
 
         // RateLimiter 모킹, rate limit 없도록 항상 true 반환
         when(rateLimiter.tryConsume(anyString(), anyInt())).thenAnswer(invocation -> true);
