@@ -9,7 +9,7 @@
   - 기술 스택
   - 서비스 대표 기능
 
-# 프로젝트 구조
+# 프로젝트 디렉토리 구조
 ```
 (root)
   ├─ frontend: 프로젝트 프론트엔드
@@ -19,7 +19,7 @@
 ```
 - [`/document/issue`](/document/issue)에서 프로젝트를 진행하며 해결한 이슈를 자세히 확인하실 수 있습니다
 
-# 기술 스택
+# 기술 스택 및 아키텍처
 ![프로젝트 기술](./document/image/tech-stack.jpg)
 
 ## 프론트엔드
@@ -34,8 +34,11 @@
 - Spring Boot
 - Spring Data JPA
 - MySQL
+- Redis
 
 서버 앱 프레임워크로 Flask를 사용해 본 적이 있습니다. Flask의 경우 경량 프레임워크이기 때문에 직접 구현해야하는 부분이 많아 번거로운 부분이 많았습니다. 최근 Spring과 Spring MVC를 공부하면서 객체지향 웹 프레임워크의 Best Practice를 보는 것 같다는 생각을 하게 되었고 매력적으로 느껴졌습니다. 따라서 이번 프로젝트에서는 Spring을 사용해 봤습니다. Spring Data JPA의 경우, 엔티티만 구현하면 DAO를 자동으로 만들어주기 때문에 구현 부담을 줄이기 위해 사용했습니다.
+
+메인 DB(ex. 회원 데이터, 관광지 데이터)로는 MySQL을 사용하고 보조 DB(ex. 실시간 트렌드 수집 및 집계)로 Redis를 사용했습니다.
 
 ## 그 외
 - Postman
@@ -45,6 +48,11 @@
 프론트엔드와 서버를 분리해 독립적으로 테스트하기 위해 Postman과 MSW를 사용했습니다. 또한 OpenAPI spec을 기준으로 API 명세를 작성했습니다.
 
 # 서비스 대표 기능
+## 관광지 추천
+![관광지 추천 데모](./document/image/tourspot-recommend-demo.gif)
+- 사용자가 관심있어할만한 관광지를 추천합니다
+  - 인기있는 관광지(일정 시간 내 조회 수, 북마크 수) 추천
+
 ## 관광지 검색 및 조회
 ![관광지 검색 및 조회 데모](./document/image/tourspot-search-demo.gif)
 - 여러 태그(이름, 태그)에 맞는 관광지를 검색할 수 있습니다
