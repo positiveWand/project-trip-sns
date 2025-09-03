@@ -34,7 +34,7 @@ export const recommendationHandlers = [
   http.get('/api/recommendations/:recommendationType', async ({ params }) => {
     const { recommendationType } = params;
 
-    if (recommendationType != 'main') {
+    if (recommendationType != 'main' && recommendationType != 'trend') {
       return HttpResponse.json(
         {
           error: 'NO_RECOMMENDATION',

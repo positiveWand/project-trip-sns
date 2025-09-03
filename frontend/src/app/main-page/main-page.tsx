@@ -26,7 +26,7 @@ function MainPage() {
             <>
               <HeadingContainer className='mt-5'>
                 <Heading2Title>이런 관광지는 어때요?</Heading2Title>
-                <HeadingDescription>북마크 관광지를 기반으로 구성해봤어요</HeadingDescription>
+                <HeadingDescription>현재 TOURIN에서 인기있는 관광지</HeadingDescription>
                 <Separator />
               </HeadingContainer>
               <div className='mt-3'>

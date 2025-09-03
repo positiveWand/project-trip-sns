@@ -8,7 +8,7 @@ export interface MainRecommendationProps {
 }
 
 export function MainRecommendation({ className }: MainRecommendationProps) {
-  const [recommendation, error, loading] = useTourSpotRecommendations('main');
+  const [recommendation, error, loading] = useTourSpotRecommendations('trend');
 
   if (loading) {
     return null;
