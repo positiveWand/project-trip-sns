@@ -106,6 +106,7 @@ class UserControllerTest {
                     "대충 address2",
                     111,
                     111,
+                    "대충 전화번호",
                     37.5642135,
                     127.0016985,
                     Arrays.asList(TourSpotCategory.EXPERIENCE)

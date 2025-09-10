@@ -43,6 +43,7 @@ class TourSpotSchedulerTest {
                 "상세주소",
                 1,
                 1,
+                "테스트 전화번호",
                 1.0,
                 1.0,
                 null

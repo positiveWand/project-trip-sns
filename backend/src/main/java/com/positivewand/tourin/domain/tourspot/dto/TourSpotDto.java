@@ -24,7 +24,7 @@ public record TourSpotDto(
                 entity.getLng(),
                 entity.getImageUrl(),
                 entity.getDescription(),
-                entity.getFullAddress(),
+                entity.getPhoneNumber(),
                 entity.getTags().stream().map((tourSpotTag -> tourSpotTag.getTag().getViewString())).toList()
         );
     }

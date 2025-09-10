@@ -39,6 +39,7 @@ public interface TourSpotRepository extends JpaRepository<TourSpot, Long> {
                 filtered_ts.address2 as address1,
                 filtered_ts.province_code as province_code,
                 filtered_ts.district_code as district_code,
+                filtered_ts.phone_number as phone_number,
                 filtered_ts.lat as lat,
                 filtered_ts.lng as lng
             FROM (SELECT ts.* FROM tour_spot ts WHERE MATCH(ts.name) AGAINST(:query IN BOOLEAN MODE)) filtered_ts
@@ -70,6 +71,7 @@ public interface TourSpotRepository extends JpaRepository<TourSpot, Long> {
                 filtered_ts.address2 as address1,
                 filtered_ts.province_code as province_code,
                 filtered_ts.district_code as district_code,
+                filtered_ts.phone_number as phone_number,
                 filtered_ts.lat as lat,
                 filtered_ts.lng as lng
             FROM (SELECT ts.* FROM tour_spot ts) filtered_ts
@@ -129,6 +131,7 @@ public interface TourSpotRepository extends JpaRepository<TourSpot, Long> {
                 filtered_ts.address2 as address1,
                 filtered_ts.province_code as province_code,
                 filtered_ts.district_code as district_code,
+                filtered_ts.phone_number as phone_number,
                 filtered_ts.lat as lat,
                 filtered_ts.lng as lng
             FROM (
@@ -178,6 +181,7 @@ public interface TourSpotRepository extends JpaRepository<TourSpot, Long> {
                 filtered_ts.address2 as address1,
                 filtered_ts.province_code as province_code,
                 filtered_ts.district_code as district_code,
+                filtered_ts.phone_number as phone_number,
                 filtered_ts.lat as lat,
                 filtered_ts.lng as lng
             FROM (

@@ -106,6 +106,7 @@ public class TourSpotSearchControllerTest {
                         "대충 address2",
                         111,
                         111,
+                        "대충 전화번호",
                         i < 10 ? seoulLat : tokyoLat,
                         i < 10 ? seoulLng : tokyoLng,
                         Arrays.asList(tags[i % 3])

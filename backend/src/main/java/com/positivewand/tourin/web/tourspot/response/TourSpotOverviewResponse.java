@@ -12,6 +12,7 @@ public record TourSpotOverviewResponse(
         double lng,
         String imageUrl,
         String description,
+        String phoneNumber,
         List<String> tags
 ) {
     public static TourSpotOverviewResponse createFromTourSpotDto(TourSpotDto tourSpotDto) {
@@ -23,6 +24,7 @@ public record TourSpotOverviewResponse(
                 tourSpotDto.lng(),
                 tourSpotDto.imageUrl(),
                 tourSpotDto.description(),
+                tourSpotDto.phoneNumber(),
                 tourSpotDto.tags()
         );
     }

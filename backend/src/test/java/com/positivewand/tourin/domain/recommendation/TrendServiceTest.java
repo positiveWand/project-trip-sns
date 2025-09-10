@@ -105,7 +105,7 @@ class TrendServiceTest {
         sortedList.sort((e1, e2) -> {
             int c = e2.getValue().compareTo(e1.getValue());
             if (c != 0) return c;
-            return String.valueOf(e2.getKey()).compareTo(String.valueOf(e1.getKey()));
+            return e2.getKey().compareTo(e1.getKey());
         });
         System.out.println("[기대 관광지 점수 순 정렬]");
         System.out.println(sortedList);

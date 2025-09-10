@@ -81,6 +81,7 @@ class TourSpotControllerTest {
                 "대충 address2",
                 111,
                 111,
+                "대충 전화번호",
                 37.7642173334521,
                 128.88380355693758,
                 Arrays.asList(TourSpotCategory.EXPERIENCE)

@@ -34,6 +34,8 @@ public class TourSpot {
     private Integer provinceCode;
     @Column(name="district_code")
     private Integer districtCode;
+    @Column(name="phone_number")
+    private String phoneNumber;
     @Column(name = "lat")
     private Double lat;
     @Column(name = "lng")
@@ -53,6 +55,7 @@ public class TourSpot {
             String address2,
             int provinceCode,
             int districtCode,
+            String phoneNumber,
             double lat,
             double lng,
             List<TourSpotCategory> tags
@@ -68,6 +71,7 @@ public class TourSpot {
         newTourSpot.address2 = address2;
         newTourSpot.provinceCode = provinceCode;
         newTourSpot.districtCode = districtCode;
+        newTourSpot.phoneNumber = phoneNumber;
         newTourSpot.lat = lat;
         newTourSpot.lng = lng;
         newTourSpot.tags = new ArrayList<>();
