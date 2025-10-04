@@ -2,12 +2,11 @@ package com.positivewand.tourin.web.aop;
 
 import com.positivewand.tourin.domain.auth.CustomUserDetails;
 import com.positivewand.tourin.domain.auth.CustomUserDetailsService;
-import com.positivewand.tourin.domain.recommendation.TrendService;
 import com.positivewand.tourin.domain.tourspot.TourSpotService;
 import com.positivewand.tourin.domain.tourspot.dto.TourSpotDto;
 import com.positivewand.tourin.domain.user.BookmarkService;
 import com.positivewand.tourin.domain.user.dto.BookmarkDto;
-import com.positivewand.tourin.infrastructure.ratelimit.RateLimiter;
+import com.positivewand.tourin.event.trend.TrendEventService;
 import com.positivewand.tourin.web.common.ClientIdResolver;
 import com.positivewand.tourin.web.tourspot.TourSpotController;
 import com.positivewand.tourin.web.user.UserController;
@@ -33,15 +32,13 @@ class TrendAspectTest {
     @Autowired
     UserController userController;
     @MockitoBean
-    TrendService trendService;
+    TrendEventService trendEventService;
     @MockitoBean
     CustomUserDetailsService userDetailsService;
     @MockitoBean
     BookmarkService bookmarkService;
     @MockitoBean
     TourSpotService tourSpotService;
-    @MockitoBean
-    RateLimiter rateLimiter;
     @MockitoBean
     ClientIdResolver clientIdResolver;
 
@@ -57,7 +54,7 @@ class TrendAspectTest {
             tourSpotIds.add(i);
         }
 
-        Map<Long, Long> collected = new HashMap<>();
+        Map<String, Long> collected = new HashMap<>();
         
         // Controller가 호출하는 Service 모킹
         when(tourSpotService.findTourSpot(anyLong())).thenAnswer(invocation -> {
@@ -79,19 +76,26 @@ class TrendAspectTest {
             return new BookmarkDto("", tourSpotId, new TourSpotDto(tourSpotId, null, null, 1.0, 1.0, null, null, null, null));
         });
         
-        // 테스트 관심사는 TrendAspect이기 때문에 그것이 의존하는 TrendService도 모킹
+        // 테스트 관심사는 TrendAspect이기 때문에 그것이 의존하는 TrendEventService도 모킹
         doAnswer(invocation -> {
-            long tourSpotId = invocation.getArgument(0, Long.class);
-            double delta = invocation.getArgument(1, Double.class);
+            String userId = invocation.getArgument(0, String.class);
+            String tourSpotId = invocation.getArgument(1, String.class);
 
             if (!collected.containsKey(tourSpotId))
                 collected.put(tourSpotId, 0L);
-            collected.put(tourSpotId, collected.get(tourSpotId) + (long) delta);
+            collected.put(tourSpotId, collected.get(tourSpotId) + VISIT_SCORE);
             return null;
-        }).when(trendService).incrementTrendScore(anyLong(), anyDouble());
+        }).when(trendEventService).publishTourspotViewEvent(anyString(), anyString());
 
-        // RateLimiter 모킹, rate limit 없도록 항상 true 반환
-        when(rateLimiter.tryConsume(anyString(), anyInt())).thenAnswer(invocation -> true);
+        doAnswer(invocation -> {
+            String userId = invocation.getArgument(0, String.class);
+            String tourSpotId = invocation.getArgument(1, String.class);
+
+            if (!collected.containsKey(tourSpotId))
+                collected.put(tourSpotId, 0L);
+            collected.put(tourSpotId, collected.get(tourSpotId) + BOOKMARK_SCORE);
+            return null;
+        }).when(trendEventService).publishTourspotBookmarkEvent(anyString(), anyString());
 
         // ClientIdResolver 모킹
         when(clientIdResolver.resolve()).thenAnswer(invocation -> "testuser");
@@ -103,7 +107,7 @@ class TrendAspectTest {
         for (int iter = 0; iter < 20; iter++) {
             collected.clear();
 
-            Map<Long, Long> expected = new HashMap<>();
+            Map<String, Long> expected = new HashMap<>();
             
             for (int i = 0; i < 1000; i++) {
                 // 전체 중 20% - 예외 발생하여 집계되지 않음
@@ -116,9 +120,9 @@ class TrendAspectTest {
                     // 무작위 관광지 선정
                     long id = (long) (Math.random() * 99) + 1;
                     tourSpotController.getTourSpot(id);
-                    if (!expected.containsKey(id))
-                        expected.put(id, 0L);
-                    expected.put(id, expected.get(id) + VISIT_SCORE);
+                    if (!expected.containsKey(String.valueOf(id)))
+                        expected.put(String.valueOf(id), 0L);
+                    expected.put(String.valueOf(id), expected.get(String.valueOf(id)) + VISIT_SCORE);
                 }
             }
             for (int i = 0; i < 1000; i++) {
@@ -136,9 +140,9 @@ class TrendAspectTest {
                             new CustomUserDetails(null, "user"+useri, null, null, null, null)
                     );
                     userController.addUserBookmark("user"+useri, new AddBookmarkRequest(id));
-                    if (!expected.containsKey(id))
-                        expected.put(id, 0L);
-                    expected.put(id, expected.get(id) + BOOKMARK_SCORE);
+                    if (!expected.containsKey(String.valueOf(id)))
+                        expected.put(String.valueOf(id), 0L);
+                    expected.put(String.valueOf(id), expected.get(String.valueOf(id)) + BOOKMARK_SCORE);
                 }
             }
             

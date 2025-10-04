@@ -1,12 +1,12 @@
 package com.positivewand.tourin.web.tourspot;
 
 import com.positivewand.tourin.domain.auth.CustomUserDetailsService;
-import com.positivewand.tourin.domain.recommendation.TrendService;
 import com.positivewand.tourin.domain.tourspot.TourSpotRepository;
 import com.positivewand.tourin.domain.tourspot.entity.TourSpot;
 import com.positivewand.tourin.domain.tourspot.entity.TourSpotCategory;
 import com.positivewand.tourin.domain.user.UserRepository;
 import com.positivewand.tourin.domain.user.entity.User;
+import com.positivewand.tourin.event.trend.TrendEventService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -42,11 +41,11 @@ class RecommendationControllerTest {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
     @Autowired
+    private TrendEventService trendEventService;
+    @Autowired
     private UserRepository userRepository;
     @Autowired
     private TourSpotRepository tourSpotRepository;
-    @Autowired
-    private TrendService trendService;
 
     @BeforeEach
     void setUpEach() {
@@ -108,13 +107,6 @@ class RecommendationControllerTest {
 
             tourSpotRepository.save(testTourSpot);
         }
-
-        // given - 트렌드 점수 저장소에 관광지 저장
-        trendService.resetTrend();
-        for (int id = 1000000000; id < 1000000010; id++) {
-            trendService.incrementTrendScore(id, 1);
-        }
-        trendService.slideTrendTopkWindow();
 
         mockMvc.perform(get("/api/recommendations/trend")
                         .with(testUser("userfortestA"))
