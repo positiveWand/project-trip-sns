@@ -24,7 +24,7 @@ def get_trend_topk(k) -> list[TrendItem]:
     topk = _redis.zrevrange(
         name=TREND_WINDOW,
         start=0,
-        end=k,
+        end=k-1,
         withscores=True
     )
     topk = list(map(lambda x: TrendItem(item_id=x[0], trend_score=x[1]), topk))
