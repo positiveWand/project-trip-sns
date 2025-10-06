@@ -62,7 +62,7 @@ class TestServiceTrend(unittest.TestCase):
         print(expected_topk)
 
         aggregated_topk = trend_service.get_trend_topk(150)
-        aggregated_topk = list(map(lambda x: x[0], aggregated_topk))
+        aggregated_topk = list(map(lambda x: x.item_id, aggregated_topk))
         print('[실제 관광지 점수 순 정렬]')
         print(aggregated_topk)
 

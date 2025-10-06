@@ -1,25 +1,15 @@
 from datetime import datetime, timedelta
 
-from pydantic import BaseModel, ConfigDict
-
 import service.trend as trend_service
 from infrasturcture.ratelimit import *
-from event.event import Event, EventHandleResult
+from event.event import EventHandleResult, UserTourspotEvent
 
 TOURSPOT_VIEW_SCORE = 1
 TOURSPOT_BOOKMARK_SCORE = 2
 
-class TrendData(BaseModel):
-    user_id: str
-    tourspot_id: str
-
-class TrendEvent(Event):
-    data: TrendData
-    model_config = ConfigDict(from_attributes=True)
-
 def handle_trend_event(event) -> EventHandleResult:
     # 이벤트 모델 변환
-    event = TrendEvent.model_validate(event)
+    event = UserTourspotEvent.model_validate(event)
 
     # 이벤트 만료 및 멱등성 처리
     if event.timestamp < datetime.now() - timedelta(minutes=trend_service.TREND_WINDOW_EPOCH_DURATION):
