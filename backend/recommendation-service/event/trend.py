@@ -14,7 +14,7 @@ def handle_trend_event(event) -> EventHandleResult:
     # 이벤트 만료 및 멱등성 처리
     if event.timestamp < datetime.now() - timedelta(minutes=trend_service.TREND_WINDOW_EPOCH_DURATION):
         return 'EXPIRED'
-    if not try_single_consume(f'idem:{event.id}', 3600):
+    if not try_single_consume(f'idem:recommendation:trend:{event.id}', 3600):
         return 'DUPLICATE'
     
     # 이벤트 처리
