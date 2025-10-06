@@ -60,7 +60,13 @@ def start_consuming():
             channel.start_consuming()
         except Exception as e:
             logger.error('연결 중 오류 발생', exc_info=True)
-            time.sleep(5)
+        finally:
+            try:
+                connection.close()
+            except Exception as e:
+                logger.error('연결 해제 중 오류 발생', exc_info=True)
+        
+        time.sleep(5)
 
 def subscribe(event_stream_key: str, handler: callable):
     handler_lock.acquire()    
