@@ -24,7 +24,7 @@ class TestServiceTrend(unittest.TestCase):
         for i in range(6):
             similar_items = [f't{10*i}', f't{10*i+1}']
             test_recommendations.append({
-                'timestamp': datetime.now()-timedelta(minutes=10*i),
+                'created_at': datetime.now()-timedelta(minutes=10*i),
                 'type': 'text_embedding_similarity',
                 'user_id': 'testuser1',
                 'query_item_id': f't{i}',
@@ -33,7 +33,7 @@ class TestServiceTrend(unittest.TestCase):
             })
             expected_topk += similar_items
         test_recommendations.append({
-            'timestamp': datetime.now(),
+            'created_at': datetime.now(),
             'type': 'text_embedding_similarity',
             'user_id': 'testuser2',
             'query_item_id': '',
@@ -51,7 +51,7 @@ class TestServiceTrend(unittest.TestCase):
             personalized_service.get_personalized_topk('testuser1', 20)
         )
     
-    def test_retreive_similar_items(self):
+    def test_retreive_similar_topk(self):
         personalized_service._tourspot_ids = [str(i) for i in range(10)]
         personalized_service._tourspot_embeddings = [
             [0, i]
@@ -62,11 +62,11 @@ class TestServiceTrend(unittest.TestCase):
 
         self.assertEqual(
             ['1', '2', '3', '4', '5'],
-            personalized_service.retrieve_similar_items('0', 5),
+            personalized_service.retrieve_similar_topk('0', 5),
         )
         self.assertEqual(
             ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
-            personalized_service.retrieve_similar_items('0', 20),
+            personalized_service.retrieve_similar_topk('0', 20),
         )
 
     def test_append_similar_items(self):
@@ -81,7 +81,7 @@ class TestServiceTrend(unittest.TestCase):
 
         test_recommendations = [
             {
-                'timestamp': datetime.now()-timedelta(minutes=10),
+                'created_at': datetime.now()-timedelta(minutes=10),
                 'type': 'text_embedding_similarity',
                 'user_id': 'testuser1',
                 'query_item_id': 't1',
@@ -89,7 +89,7 @@ class TestServiceTrend(unittest.TestCase):
                 'similar_items': ['t2', 't3']
             },
             {
-                'timestamp': datetime.now()-timedelta(minutes=20),
+                'created_at': datetime.now()-timedelta(minutes=20),
                 'type': 'text_embedding_similarity',
                 'user_id': 'testuser1',
                 'query_item_id': 't3',
@@ -103,7 +103,7 @@ class TestServiceTrend(unittest.TestCase):
         test_source_event.timestamp = test_source_event.timestamp.replace(microsecond=(test_source_event.timestamp.microsecond // 1000) * 1000)
         personalized_service.append_similar_items('testuser1', 't0', test_source_event)
 
-        new_recommendation = self.user_rec_collection.find({'user_id': 'testuser1'}).sort('timestamp', -1).limit(1).next()
+        new_recommendation = self.user_rec_collection.find({'user_id': 'testuser1'}).sort('created_at', -1).limit(1).next()
         self.assertEqual(
             'testuser1',
             new_recommendation['user_id']

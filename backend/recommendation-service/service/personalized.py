@@ -24,17 +24,17 @@ def init_model():
     _knn_model.fit(_tourspot_embeddings)
 
 def get_personalized_topk(user_id: str, k: int) -> list[str]:
-    # timestamp 기준으로 top-k 정렬
+    # created_at 기준으로 top-k 정렬
     mongo = infrasturcture.mongodb.get_mongo()
     collection = mongo['tourin']['user_recommendation']
 
     topk = []
-    for rec in collection.find({'user_id': user_id}).sort('timestamp', -1):
+    for rec in collection.find({'user_id': user_id}).sort('created_at', -1):
         topk += rec['similar_items']
 
     return topk[:k]
 
-def retrieve_similar_items(query_item_id: str, k: int) -> list[str]:
+def retrieve_similar_topk(query_item_id: str, k: int) -> list[str]:
     # top-k 유사 아이템 반환
     global _tourspot_ids, _tourspot_embeddings, _knn_model
     if _tourspot_ids is None or _tourspot_embeddings is None or _knn_model is None:
@@ -54,7 +54,7 @@ def retrieve_similar_items(query_item_id: str, k: int) -> list[str]:
 
 def append_similar_items(user_id: str, item_id: str, event: Event):
     # top-k 유사 아이템 얻기
-    topk = retrieve_similar_items(item_id, 10)
+    topk = retrieve_similar_topk(item_id, 10)
     
     # 중복된 아이템 필터링
     mongo = infrasturcture.mongodb.get_mongo()
@@ -74,7 +74,7 @@ def append_similar_items(user_id: str, item_id: str, event: Event):
 
     # 아이템 추천 확정 및 삽입
     collection.insert_one({
-        'timestamp': datetime.now(),
+        'created_at': datetime.now(),
         'type': 'text_embedding_similarity',
         'user_id': user_id,
         'query_item_id': item_id,
