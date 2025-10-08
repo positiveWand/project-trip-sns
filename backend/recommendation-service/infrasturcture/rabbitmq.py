@@ -41,10 +41,21 @@ def start_consuming():
                 }
             )
             channel.queue_bind(exchange='event.user.ex', queue='recommendation.trend')
+            channel.queue_declare(
+                queue='recommendation.personalized',
+                arguments={
+                    'x-message-ttl': 600000,
+                    'x-dead-letter-exchange': 'event.user.dlx',
+                    'x-dead-letter-routing-key': 'recommendation.personalized'
+                }
+            )
+            channel.queue_bind(exchange='event.user.ex', queue='recommendation.personalized')
 
-            channel.exchange_declare(exchange='event.user.dlx', exchange_type='direct', durable=True)
-            channel.queue_declare(queue='recommendation.trend.dlq', durable=True)
+            channel.exchange_declare(exchange='event.user.dlx', exchange_type='direct', durable=False)
+            channel.queue_declare(queue='recommendation.trend.dlq', durable=False)
             channel.queue_bind(exchange='event.user.dlx', queue='recommendation.trend.dlq', routing_key='recommendation.trend')
+            channel.queue_declare(queue='recommendation.personalized.dlq', durable=False)
+            channel.queue_bind(exchange='event.user.dlx', queue='recommendation.personalized.dlq', routing_key='recommendation.personalized')
 
             channel.basic_qos(prefetch_count=5)
 
@@ -55,6 +66,13 @@ def start_consuming():
                 exclusive=True
             )
             _QUEUE_TO_EVENT_STREAM[consumer_tag] = 'recommendation.trend'
+            consumer_tag = channel.basic_consume(
+                queue='recommendation.personalized',
+                on_message_callback=dispatch_event,
+                auto_ack=False,
+                exclusive=True
+            )
+            _QUEUE_TO_EVENT_STREAM[consumer_tag] = 'recommendation.personalized'
 
             logger.info('이벤트 소비 시작!')
             channel.start_consuming()
