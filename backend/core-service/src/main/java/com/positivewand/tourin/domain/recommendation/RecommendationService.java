@@ -14,6 +14,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -60,6 +61,33 @@ public class RecommendationService {
 
         return topkIds.stream()
                 .map(mapById::get)
+                .filter(Objects::nonNull)
+                .map(TourSpotDto::create)
+                .toList();
+    }
+
+    public List<TourSpotDto> getPersonalizedRecommendation(String username) {
+        String url = UriComponentsBuilder
+                .fromUri(URI.create(RECOMMENDATION_SERVICE_BASE_URL + "/api/recommendations/personalized"))
+                .queryParam("user_id", username)
+                .queryParam("k", TOPK_LIMIT)
+                .toUriString();
+
+        String[] topkItems = restTemplate.getForObject(url, String[].class);
+        if (topkItems == null || topkItems.length == 0)
+            return List.of();
+
+        List<Long> topkIds = Arrays.stream(topkItems)
+                .map(Long::parseLong)
+                .toList();
+
+        List<TourSpot> tourSpots = tourSpotRepository.findAllById(topkIds);
+        Map<Long, TourSpot> mapById = tourSpots.stream()
+                .collect(Collectors.toMap(TourSpot::getId, Function.identity()));
+
+        return topkIds.stream()
+                .map(mapById::get)
+                .filter(Objects::nonNull)
                 .map(TourSpotDto::create)
                 .toList();
     }
