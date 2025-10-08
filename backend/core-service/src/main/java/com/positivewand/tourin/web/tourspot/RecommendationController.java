@@ -1,0 +1,42 @@
+package com.positivewand.tourin.web.tourspot;
+
+import com.positivewand.tourin.domain.auth.CustomUserDetailsService;
+import com.positivewand.tourin.domain.recommendation.RecommendationService;
+import com.positivewand.tourin.domain.tourspot.dto.TourSpotDto;
+import com.positivewand.tourin.web.tourspot.response.TourSpotOverviewResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api")
+@RequiredArgsConstructor
+public class RecommendationController {
+    private final RecommendationService recommendationService;
+    private final CustomUserDetailsService userDetailsService;
+
+    @GetMapping("/recommendations/test")
+    public List<TourSpotOverviewResponse> getTestRecommendation() {
+        List<TourSpotDto> recommendation = recommendationService.getTestRecommendation("");
+
+        return recommendation.stream().map(TourSpotOverviewResponse::createFromTourSpotDto).toList();
+    }
+
+    @GetMapping("/recommendations/trend")
+    public List<TourSpotOverviewResponse> getTrendRecommendation() {
+        List<TourSpotDto> recommendation = recommendationService.getTrendRecommendation();
+
+        return recommendation.stream().map(TourSpotOverviewResponse::createFromTourSpotDto).toList();
+    }
+
+    @GetMapping("/recommendations/personalized")
+    public List<TourSpotOverviewResponse> getPersonalizedRecommendation() {
+        String username = userDetailsService.getCurrentContextUser().getUsername();
+        List<TourSpotDto> recommendation = recommendationService.getPersonalizedRecommendation(username);
+
+        return recommendation.stream().map(TourSpotOverviewResponse::createFromTourSpotDto).toList();
+    }
+}

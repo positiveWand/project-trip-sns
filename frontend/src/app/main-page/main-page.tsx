@@ -5,11 +5,12 @@ import Page from '@/components/layout/page';
 import { Header } from '@/components/layout/header';
 import { HeadingContainer, Heading2Title, HeadingDescription } from '@/components/heading';
 import Main from '@/components/layout/main';
-import { MainRecommendation } from './main-recommendation';
+import { Recommendation } from './main-recommendation';
 import { Separator } from '@/components/ui/separator';
 import { Welcome } from './welcome';
 import { useUserSession } from '@/hooks/use-user-session';
 import initApp from '@/init';
+import { TrendingUp, FileClock } from 'lucide-react';
 
 await initApp();
 
@@ -24,13 +25,31 @@ function MainPage() {
           <Welcome username={userInfo?.name} />
           {sessionActive && (
             <>
-              <HeadingContainer className='mt-5'>
-                <Heading2Title>이런 관광지는 어때요?</Heading2Title>
-                <HeadingDescription>현재 TOURIN에서 인기있는 관광지</HeadingDescription>
-                <Separator />
-              </HeadingContainer>
-              <div className='mt-3'>
-                <MainRecommendation />
+              <div>
+                <HeadingContainer className='mt-5'>
+                  <Heading2Title className='flex items-center'>
+                    <TrendingUp className='mr-2'/>
+                    트렌드 관광지
+                  </Heading2Title>
+                  <HeadingDescription>현재 TOURIN에서 인기있는 관광지</HeadingDescription>
+                  <Separator />
+                </HeadingContainer>
+                <div className='mt-3'>
+                  <Recommendation type='trend' placeholder='현재 집계된 관광지가 없습니다.'/>
+                </div>
+              </div>
+              <div>
+                <HeadingContainer className='mt-10'>
+                  <Heading2Title className='flex items-center'>
+                    <FileClock className='mr-2'/>
+                    개인 추천 관광지
+                  </Heading2Title>
+                  <HeadingDescription>{userInfo?.name}님이 관심있게 본 관광지와 유사한 관광지</HeadingDescription>
+                  <Separator />
+                </HeadingContainer>
+                <div className='mt-3'>
+                  <Recommendation type='personalized' placeholder='추천을 받기 위해 관광지를 찾거나 북마크 하세요!'/>
+                </div>
               </div>
             </>
           )}

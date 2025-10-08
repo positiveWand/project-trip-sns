@@ -3,7 +3,6 @@ from prefect.states import Completed
 from prefect.blocks.system import Secret
 from prefect.variables import Variable
 from prefect.logging import get_run_logger
-from prefect.concurrency.sync import rate_limit
 import os
 import datetime
 import pandas as pd
@@ -11,8 +10,6 @@ import mysql.connector
 import json
 from pydantic import BaseModel
 from prefect.flow_runs import pause_flow_run
-from google import genai
-from google.genai import types
 
 import tourspot_data_fetch
 import tourspot_data_load
@@ -182,72 +179,6 @@ def transform_tourspot_data():
     transformed.to_csv('./assets/tourspots_full_transformed.csv', encoding='utf-8-sig', index=False)
     logger.info('tourspots_full_transformed.csv 파일 생성됨.')
 
-@task(
-    persist_result=True,
-    cache_key_fn=lambda _, params: f'TOURSPOT_EMBEDDINGS(KEY={params['key']},OFFSET={params['offset']},LIMIT={params['limit']})',
-    result_serializer='json',
-    retries=3, 
-    retry_delay_seconds=300
-)
-def embed_tourspots(df: pd.DataFrame, key: str, offset: int, limit: int) -> list[TourSpotEmbedding]:
-    GOOGLE_API_KEY = Secret.load('google-api-key').get()
-    client = genai.Client(api_key=GOOGLE_API_KEY)
-
-    sliced = df.iloc[offset:offset+limit][['id', 'description']]
-    filtered = sliced.dropna(subset=['description']).loc[lambda d: d['description'].str.strip() != '']
-
-    tourspot_ids = filtered['id'].to_list()
-    texts = filtered['description'].to_list()
-
-    if not texts:
-        return Completed(
-            message=f'관광지 임베딩 생성하기(KEY={key}, OFFSET={offset}, LIMIT={limit}) 완료.',
-            data=[]
-        )
-
-    rate_limit('google-api-rate-limit')
-    result = client.models.embed_content(
-        model='gemini-embedding-001',
-        contents=texts,
-        config=types.EmbedContentConfig(
-            task_type='SEMANTIC_SIMILARITY',
-            output_dimensionality=1536
-        )
-    ).embeddings
-
-    tourspot_embeddings = []
-    for tourspot_id, embedding in zip(tourspot_ids, result):
-        tourspot_embeddings.append(TourSpotEmbedding(id=tourspot_id, embedding=embedding.values))
-    
-    return Completed(
-        message=f'관광지 임베딩 생성하기(KEY={key}, OFFSET={offset}, LIMIT={limit}) 완료.',
-        data=tourspot_embeddings
-    )
-
-@flow
-def embed_all_tourspots():
-    logger = get_run_logger()
-
-    tourspots_df = pd.read_csv('./assets/tourspots_full_transformed.csv')
-    updated_at = datetime.datetime.fromtimestamp(os.path.getmtime('./assets/tourspots_full_transformed.csv'))
-    
-    tourspot_embeddings = list()
-
-    total_count = len(tourspots_df)
-    limit = 100
-    logger.info('총 관광지 개수=%s', total_count)
-
-    for offset in range(0, total_count, limit):
-        embeddings = embed_tourspots(tourspots_df, updated_at.strftime("%Y%m%d-%H%M%S"), offset, limit, return_state=True).result()
-        
-        tourspot_embeddings += list(map(lambda t: t.model_dump(), embeddings))
-    
-    logger.info('임베딩 개수=%s', len(tourspot_embeddings))
-    embeddings_df = pd.DataFrame(tourspot_embeddings)
-    embeddings_df.drop_duplicates(subset=['id'], inplace=True)
-    embeddings_df.to_csv('./assets/tourspot_embeddings.csv', encoding='utf-8-sig', index=False)
-    logger.info('tourspot_embeddings.csv 파일 생성됨.')
-
 @task
 def load_data(host: str, port: int, user: str, password: str, database: str, append: bool):
     logger = get_run_logger()
@@ -298,8 +229,6 @@ async def pipe_tourspot(content_types: list[int], locations: list[tuple[float, f
 
     join_tourspot_data()
     transform_tourspot_data()
-
-    # embed_all_tourspots()
 
     form = await pause_flow_run(wait_for_input=LoadDataForm)
     if not form.load_to_db:
