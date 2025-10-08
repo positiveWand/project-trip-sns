@@ -3,7 +3,6 @@ package com.positivewand.tourin.event.trend;
 import com.positivewand.tourin.infrastructure.RabbitConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
@@ -27,11 +26,7 @@ public class TrendEventService {
                 LocalDateTime.now()
         );
 
-        try {
-            rabbitTemplate.convertAndSend(RabbitConfig.USER_EVENT_EXCHANGE, event);
-        } catch (AmqpException e) {
-            log.error("[이벤트] 관광지 조회 이벤트 출판 실패", e);
-        }
+        rabbitTemplate.convertAndSend(RabbitConfig.USER_EVENT_EXCHANGE, "", event);
     }
 
     public void publishTourspotBookmarkEvent(String userId, String tourspotId) {
@@ -45,10 +40,6 @@ public class TrendEventService {
                 LocalDateTime.now()
         );
 
-        try {
-            rabbitTemplate.convertAndSend(RabbitConfig.USER_EVENT_EXCHANGE, event);
-        } catch (AmqpException e) {
-            log.error("[이벤트] 관광지 조회 이벤트 출판 실패", e);
-        }
+        rabbitTemplate.convertAndSend(RabbitConfig.USER_EVENT_EXCHANGE, "", event);
     }
 }
