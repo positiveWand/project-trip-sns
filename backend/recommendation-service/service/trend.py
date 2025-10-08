@@ -1,6 +1,6 @@
 import os
 import infrasturcture.redis
-from .model.trend_item import TrendItem
+from .model import TrendItem
 
 TREND_KEY_PREFIX = 'recommendation:trend'
 TREND_WINDOW = TREND_KEY_PREFIX + ':window'
