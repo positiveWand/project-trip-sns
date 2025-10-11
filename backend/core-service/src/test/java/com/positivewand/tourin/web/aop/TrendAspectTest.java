@@ -6,7 +6,7 @@ import com.positivewand.tourin.domain.tourspot.TourSpotService;
 import com.positivewand.tourin.domain.tourspot.dto.TourSpotDto;
 import com.positivewand.tourin.domain.user.BookmarkService;
 import com.positivewand.tourin.domain.user.dto.BookmarkDto;
-import com.positivewand.tourin.event.trend.TrendEventService;
+import com.positivewand.tourin.event.user.UserEventService;
 import com.positivewand.tourin.web.common.ClientIdResolver;
 import com.positivewand.tourin.web.tourspot.TourSpotController;
 import com.positivewand.tourin.web.user.UserController;
@@ -32,7 +32,7 @@ class TrendAspectTest {
     @Autowired
     UserController userController;
     @MockitoBean
-    TrendEventService trendEventService;
+    UserEventService userEventService;
     @MockitoBean
     CustomUserDetailsService userDetailsService;
     @MockitoBean
@@ -85,7 +85,7 @@ class TrendAspectTest {
                 collected.put(tourSpotId, 0L);
             collected.put(tourSpotId, collected.get(tourSpotId) + VISIT_SCORE);
             return null;
-        }).when(trendEventService).publishTourspotViewEvent(anyString(), anyString());
+        }).when(userEventService).publishTourspotViewEvent(anyString(), anyString());
 
         doAnswer(invocation -> {
             String userId = invocation.getArgument(0, String.class);
@@ -95,7 +95,7 @@ class TrendAspectTest {
                 collected.put(tourSpotId, 0L);
             collected.put(tourSpotId, collected.get(tourSpotId) + BOOKMARK_SCORE);
             return null;
-        }).when(trendEventService).publishTourspotBookmarkEvent(anyString(), anyString());
+        }).when(userEventService).publishTourspotBookmarkEvent(anyString(), anyString());
 
         // ClientIdResolver 모킹
         when(clientIdResolver.resolve()).thenAnswer(invocation -> "testuser");

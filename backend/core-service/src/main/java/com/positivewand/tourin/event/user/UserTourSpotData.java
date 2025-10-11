@@ -1,10 +1,10 @@
-package com.positivewand.tourin.event.trend;
+package com.positivewand.tourin.event.user;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record TrendData(
+public record UserTourSpotData(
         String userId,
         String tourspotId
 ) {

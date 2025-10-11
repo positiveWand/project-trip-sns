@@ -1,4 +1,4 @@
-package com.positivewand.tourin.event.trend;
+package com.positivewand.tourin.event.user;
 
 import com.positivewand.tourin.infrastructure.RabbitConfig;
 import lombok.RequiredArgsConstructor;
@@ -12,14 +12,14 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class TrendEventService {
+public class UserEventService {
     private final RabbitTemplate rabbitTemplate;
 
     public void publishTourspotViewEvent(String userId, String tourspotId) {
-        TrendEvent event = new TrendEvent(
+        UserTourSpotEvent event = new UserTourSpotEvent(
                 UUID.randomUUID().toString(),
                 "user.viewTourspot",
-                new TrendData(
+                new UserTourSpotData(
                         userId,
                         tourspotId
                 ),
@@ -30,10 +30,10 @@ public class TrendEventService {
     }
 
     public void publishTourspotBookmarkEvent(String userId, String tourspotId) {
-        TrendEvent event = new TrendEvent(
+        UserTourSpotEvent event = new UserTourSpotEvent(
                 UUID.randomUUID().toString(),
                 "user.bookmarkTourspot",
-                new TrendData(
+                new UserTourSpotData(
                         userId,
                         tourspotId
                 ),

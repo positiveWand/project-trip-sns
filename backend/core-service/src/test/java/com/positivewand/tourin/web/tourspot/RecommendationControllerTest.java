@@ -6,7 +6,7 @@ import com.positivewand.tourin.domain.tourspot.entity.TourSpot;
 import com.positivewand.tourin.domain.tourspot.entity.TourSpotCategory;
 import com.positivewand.tourin.domain.user.UserRepository;
 import com.positivewand.tourin.domain.user.entity.User;
-import com.positivewand.tourin.event.trend.TrendEventService;
+import com.positivewand.tourin.event.user.UserEventService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ class RecommendationControllerTest {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
     @Autowired
-    private TrendEventService trendEventService;
+    private UserEventService userEventService;
     @Autowired
     private UserRepository userRepository;
     @Autowired
