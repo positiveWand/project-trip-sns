@@ -1,6 +1,6 @@
 package com.positivewand.tourin.web.aop;
 
-import com.positivewand.tourin.event.trend.TrendEventService;
+import com.positivewand.tourin.event.user.UserEventService;
 import com.positivewand.tourin.web.common.ClientIdResolver;
 import com.positivewand.tourin.web.tourspot.response.TourSpotResponse;
 import com.positivewand.tourin.web.user.response.BookmarkResponse;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TrendAspect {
     private final ClientIdResolver clientIdResolver;
-    private final TrendEventService trendEventService;
+    private final UserEventService userEventService;
 
     public static final int VISIT_SCORE = 1;
     public static final int BOOKMARK_SCORE = 2;
@@ -28,9 +28,9 @@ public class TrendAspect {
     )
     public void collectViewTrend(JoinPoint join, TourSpotResponse returnVal) {
         try {
-            trendEventService.publishTourspotViewEvent(clientIdResolver.resolve(), returnVal.id());
+            userEventService.publishTourspotViewEvent(clientIdResolver.resolve(), returnVal.id());
         } catch (Exception e) {
-            log.error("[이벤트] 관광지 조회 이벤트 출판 실패", e);
+            log.error("관광지 조회 이벤트 발행 실패", e);
         }
     }
 
@@ -40,9 +40,9 @@ public class TrendAspect {
     )
     public void collectBookmarkTrend(JoinPoint join, BookmarkResponse returnVal) {
         try {
-            trendEventService.publishTourspotBookmarkEvent(returnVal.userId(), returnVal.tourSpotId());
+            userEventService.publishTourspotBookmarkEvent(returnVal.userId(), returnVal.tourSpotId());
         } catch (Exception e) {
-            log.error("[이벤트] 관광지 조회 이벤트 출판 실패", e);
+            log.error("관광지 북마크 이벤트 발행 실패", e);
         }
     }
 }

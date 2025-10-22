@@ -1,7 +1,6 @@
-package com.positivewand.tourin.event.trend;
+package com.positivewand.tourin.event.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
@@ -11,13 +10,13 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Slf4j
-class TrendEventTest {
+class UserTourSpotEventTest {
     @Test
     void 레코드_직렬화_결과_확인() throws Exception {
-        TrendEvent event = new TrendEvent(
+        UserTourSpotEvent event = new UserTourSpotEvent(
                 UUID.randomUUID().toString(),
                 "event.test",
-                new TrendData(
+                new UserTourSpotData(
                         "testuser",
                         "2020202"
                 ),
