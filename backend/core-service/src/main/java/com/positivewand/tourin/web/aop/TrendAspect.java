@@ -30,7 +30,7 @@ public class TrendAspect {
         try {
             userEventService.publishTourspotViewEvent(clientIdResolver.resolve(), returnVal.id());
         } catch (Exception e) {
-            log.error("[이벤트] 관광지 조회 이벤트 출판 실패", e);
+            log.error("관광지 조회 이벤트 발행 실패", e);
         }
     }
 
@@ -42,7 +42,7 @@ public class TrendAspect {
         try {
             userEventService.publishTourspotBookmarkEvent(returnVal.userId(), returnVal.tourSpotId());
         } catch (Exception e) {
-            log.error("[이벤트] 관광지 조회 이벤트 출판 실패", e);
+            log.error("관광지 북마크 이벤트 발행 실패", e);
         }
     }
 }
